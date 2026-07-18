@@ -1,0 +1,5 @@
+# Optional challenge/differential engines. Missing packages are recorded explicitly;
+# the runner never performs a silent solver fallback.
+skfolio
+vectorbt
+

@@ -1,0 +1,48 @@
+name: Model change proposal
+description: Pre-register a research or validation change before implementation
+title: "[model] "
+labels: [research]
+body:
+  - type: dropdown
+    id: track
+    attributes:
+      label: Research track
+      options:
+        - Cross-asset ETF shadow
+        - Single-name options evidence
+        - Shared governance or tooling
+    validations:
+      required: true
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis and single primary change
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Point-in-time data and leakage controls
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation design, metrics and failure conditions
+    validations:
+      required: true
+  - type: input
+    id: budget
+    attributes:
+      label: Parameter or candidate budget
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy and execution boundary
+      options:
+        - label: I will use only synthetic or redistributable public data in the PR.
+          required: true
+        - label: I will not add broker connectivity, orders or automatic model promotion.
+          required: true
