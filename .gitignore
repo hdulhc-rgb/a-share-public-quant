@@ -1,0 +1,41 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+.env.*
+
+# Runtime inputs and outputs stay outside the public repository.
+data/
+runs/
+runs_*/
+demo_run/
+demo_runs/
+option_evidence_run_*/
+*.log
+
+# Private portfolio and account material.
+*holdings*.csv
+*positions*.csv
+*weights*.csv
+*cost_basis*
+*vesting*
+*rsu*
+*broker*
+*account_statement*
+*mortgage*
+
+# Binary documents and personal research files.
+*.pdf
+*.xlsx
+*.xls
+*.docx
+*.pptx
+*.m4a
+*.png
+*.jpg
+*.jpeg
+*.heic

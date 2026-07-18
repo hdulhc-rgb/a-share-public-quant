@@ -1,0 +1,3 @@
+# Required for production HKEX American-style option IV validation.
+# Missing QuantLib is reported as DEPENDENCY_MISSING; no model fallback is allowed.
+QuantLib
