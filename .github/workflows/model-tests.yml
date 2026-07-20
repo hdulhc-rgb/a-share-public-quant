@@ -22,6 +22,11 @@ jobs:
       - name: ETF shadow tests
         working-directory: models/etf_shadow_v063
         run: python -m unittest discover -s tests -v
+      - name: ETF dual-return data layer tests
+        working-directory: models/etf_shadow_v063_data2
+        env:
+          PYTHONPATH: ../etf_shadow_v063:.
+        run: python -m unittest discover -s tests -v
       - name: Options evidence tests
         working-directory: models/meituan_options_v12
         run: python -m unittest discover -s tests -v
