@@ -1,0 +1,3 @@
+# Base dependencies are installed from ../../requirements.txt.
+# Promotion validation is deliberately version-pinned.
+skfolio==0.20.1
