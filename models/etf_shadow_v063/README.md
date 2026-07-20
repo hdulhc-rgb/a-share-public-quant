@@ -18,20 +18,34 @@ python -m unittest discover -s tests -v
 python run_shadow_v0_6_3.py --demo --output-root demo_runs
 ```
 
-真实输入为宽表日收益 CSV，第一列必须叫 `date`，其余列为资产；生产数据必须是可复核的总收益/后复权口径，并只包含 as-of 当时可见信息。
+真实输入为宽表日收益 CSV，第一列必须叫 `date`，其余列为资产。生产运行不再接受只有 CSV、没有来源证明的输入；必须同时提供哈希匹配的数据清单。
+
+先从两个独立公开行情源生成前复权市场收益代理。采集器固定使用 510300、513500、513100、159937、511880，不包含任何个人持仓或账户数据：
+
+```bash
+python build_production_panel.py \
+  --start 2016-12-01 \
+  --as-of 2026-07-20 \
+  --output-dir production_data/20260720
+```
+
+门禁会核对东财前复权与不复权日期身份、东财与腾讯前复权日收益路径、完整历史、新鲜度、异常收益、共同交易日、文件哈希和 as-of 边界。任一失败都会保留清单后以非零状态退出，不会回退到未复权或合成数据。
 
 ```bash
 python run_shadow_v0_6_3.py \
-  --returns-csv returns.csv \
+  --returns-csv production_data/20260720/returns.csv \
+  --data-manifest production_data/20260720/data_manifest.json \
   --current-weights current_shadow_weights.csv \
   --benchmark-weights benchmark_weights.csv \
   --as-of 2026-07-17 \
   --output-root runs_v063
 ```
 
-权重文件格式为 `asset,weight`。若真实数据、时间边界、权重、约束守恒、双重回测或必需产物任一失败，程序返回非零并进入 `FAILED_CLOSED`。
+权重文件格式为 `asset,weight`。若真实数据、数据清单、来源哈希、时间边界、权重、约束守恒、双重回测或必需产物任一失败，程序返回非零并进入 `FAILED_CLOSED`。
 
 生产运行必须显式提供两份权重文件；程序没有真实组合默认值。请只在本地或受控环境保存这些文件，禁止提交到公开仓库。
+
+`production_data/`、运行产物和两份权重文件也不应提交；GitHub 只保存采集与校验代码、公开 ETF 映射、测试和研究契约。
 
 ## 可选开源集成
 

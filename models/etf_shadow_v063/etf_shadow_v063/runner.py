@@ -4,6 +4,7 @@ import importlib.util
 import json
 from collections import defaultdict
 from pathlib import Path
+from typing import Mapping
 
 import numpy as np
 import pandas as pd
@@ -61,6 +62,7 @@ def run_research(
     source_id: str,
     policy: ResearchPolicy,
     optional_engines: str = "record",
+    source_attestation: Mapping[str, object] | None = None,
 ) -> Path:
     validate_returns(returns, as_of, policy.min_train_observations + policy.test_observations)
     challenger_names = list(CHALLENGERS)
@@ -75,7 +77,13 @@ def run_research(
     run_id = f"v063_{as_of.strftime('%Y%m%d')}_{timestamp.strftime('%H%M%S')}_{stable_json_hash({'as_of': as_of.isoformat(), 'n': len(returns), 'hash': float(returns.iloc[-1].sum())})[:8]}"
     run_dir = create_run_directory(output_root, run_id)
     started = timestamp.isoformat()
-    fingerprint = data_fingerprint(returns, source_path, as_of, source_id)
+    fingerprint = data_fingerprint(
+        returns,
+        source_path,
+        as_of,
+        source_id,
+        source_attestation=source_attestation,
+    )
     write_json(run_dir / "data_fingerprint.json", fingerprint)
     write_json(run_dir / "dependency_gates.json", {"optional_engines": optional, "policy": optional_engines, "silent_fallback": False})
     write_json(run_dir / "pre_registration.json", {

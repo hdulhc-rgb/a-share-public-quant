@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 
 from etf_shadow_v063.core import ResearchClosed, ResearchPolicy, align_weights, policy_dict
+from etf_shadow_v063.data_pipeline import validate_production_manifest
 from etf_shadow_v063.runner import run_research
 
 
@@ -51,6 +52,7 @@ def load_weight_file(path: Path, assets: list[str]) -> pd.Series:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Cross-asset ETF v0.6.3 shadow challenge engine")
     parser.add_argument("--returns-csv", type=Path)
+    parser.add_argument("--data-manifest", type=Path)
     parser.add_argument("--current-weights", type=Path)
     parser.add_argument("--benchmark-weights", type=Path)
     parser.add_argument("--as-of", default="2026-07-17")
@@ -67,22 +69,34 @@ def main() -> int:
     if args.print_policy:
         print(json.dumps(policy_dict(policy), ensure_ascii=False, indent=2, sort_keys=True))
         return 0
-    if not args.demo and args.returns_csv is None:
-        print("FAILED_CLOSED: provide --returns-csv or use --demo", file=sys.stderr)
-        return 2
-    returns = demo_returns() if args.demo else load_returns(args.returns_csv)
-    assets = list(returns.columns)
-    if args.demo:
-        # Synthetic fixtures deliberately avoid encoding any real portfolio weights.
-        benchmark = align_weights(pd.Series(np.full(len(assets), 1.0 / len(assets)), index=assets), assets)
-        current = benchmark.copy()
-    else:
-        if args.current_weights is None or args.benchmark_weights is None:
-            print("FAILED_CLOSED: production runs require --current-weights and --benchmark-weights", file=sys.stderr)
-            return 2
-        benchmark = load_weight_file(args.benchmark_weights, assets)
-        current = load_weight_file(args.current_weights, assets)
     try:
+        if not args.demo and args.returns_csv is None:
+            raise ResearchClosed("PRODUCTION_RUN_REQUIRES_RETURNS_CSV")
+        if not args.demo and args.data_manifest is None:
+            raise ResearchClosed("PRODUCTION_RUN_REQUIRES_DATA_MANIFEST")
+        returns = demo_returns() if args.demo else load_returns(args.returns_csv)
+        assets = list(returns.columns)
+        source_attestation = None
+        if args.demo:
+            # Synthetic fixtures deliberately avoid encoding any real portfolio weights.
+            benchmark = align_weights(
+                pd.Series(np.full(len(assets), 1.0 / len(assets)), index=assets),
+                assets,
+            )
+            current = benchmark.copy()
+        else:
+            if args.current_weights is None or args.benchmark_weights is None:
+                raise ResearchClosed(
+                    "PRODUCTION_RUN_REQUIRES_CURRENT_AND_BENCHMARK_WEIGHTS"
+                )
+            source_attestation = validate_production_manifest(
+                returns=returns,
+                returns_path=args.returns_csv,
+                manifest_path=args.data_manifest,
+                as_of=pd.Timestamp(args.as_of),
+            )
+            benchmark = load_weight_file(args.benchmark_weights, assets)
+            current = load_weight_file(args.current_weights, assets)
         run_dir = run_research(
             returns=returns,
             benchmark=benchmark,
@@ -90,11 +104,16 @@ def main() -> int:
             as_of=pd.Timestamp(args.as_of),
             output_root=args.output_root,
             source_path=args.returns_csv,
-            source_id="SYNTHETIC_DEMO" if args.demo else "USER_POINT_IN_TIME_RETURN_PANEL",
+            source_id=(
+                "SYNTHETIC_DEMO"
+                if args.demo
+                else str(source_attestation["source_id"])
+            ),
             policy=policy,
             optional_engines=args.optional_engines,
+            source_attestation=source_attestation,
         )
-    except ResearchClosed as error:
+    except (ResearchClosed, OSError, ValueError) as error:
         print(f"FAILED_CLOSED: {error}", file=sys.stderr)
         return 2
     print(run_dir)

@@ -10,8 +10,10 @@ venv/
 
 # Runtime inputs and outputs stay outside the public repository.
 data/
+production_data/
 runs/
 runs_*/
+runs_v063/
 demo_run/
 demo_runs/
 option_evidence_run_*/
