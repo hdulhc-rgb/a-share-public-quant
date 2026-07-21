@@ -16,8 +16,10 @@ import pandas as pd
 from .core import ResearchClosed
 
 
-COLLECTOR_VERSION = "0.6.3-data.1"
+COLLECTOR_VERSION = "0.6.3-data.2"
 SCHEMA_VERSION = "1.0"
+CHECKPOINT_SCHEMA_VERSION = "1.0"
+CHECKPOINT_FILENAME = "collection_checkpoint.json"
 RETURN_KIND = "distribution_adjusted_market_return_proxy"
 PRIMARY_PROVIDER = "Eastmoney"
 SECONDARY_PROVIDER = "Tencent"
@@ -35,6 +37,9 @@ CUMULATIVE_LOG_RETURN_GAP_MAX = 0.03
 RETURN_CORRELATION_MIN = 0.98
 LOW_VOLATILITY_DAILY_STD_MAX = 0.00075
 LOW_VOLATILITY_P99_DIFF_MAX = 0.0015
+TENCENT_WINDOW_YEARS = 2
+TENCENT_REQUEST_ATTEMPTS = 5
+TENCENT_REQUEST_TIMEOUT_SECONDS = 45.0
 
 
 class DataGateClosed(RuntimeError):
@@ -75,6 +80,8 @@ def _request_text(
     params: Mapping[str, str],
     attempts: int = 3,
     timeout: float = 30.0,
+    backoff_base: float = 1.5,
+    backoff_cap: float = 12.0,
 ) -> str:
     request_url = f"{url}?{urllib.parse.urlencode(params)}"
     last_error: Exception | None = None
@@ -89,7 +96,7 @@ def _request_text(
         except Exception as error:  # pragma: no cover - live network path
             last_error = error
             if attempt + 1 < attempts:
-                time.sleep(1.5 * (attempt + 1))
+                time.sleep(min(backoff_cap, backoff_base * (2**attempt)))
     raise DataGateClosed(f"PUBLIC_SOURCE_UNAVAILABLE:{url}:{last_error}")
 
 
@@ -145,19 +152,51 @@ def fetch_eastmoney(
     return frame.loc[frame["date"].between(start, end)].reset_index(drop=True)
 
 
+def tencent_request_windows(
+    start: pd.Timestamp,
+    end: pd.Timestamp,
+) -> list[tuple[pd.Timestamp, pd.Timestamp]]:
+    """Split a history into windows that remain below Tencent's 640-row cap."""
+
+    start = pd.Timestamp(start).normalize()
+    end = pd.Timestamp(end).normalize()
+    if start > end:
+        raise ValueError("start must not be later than end")
+    windows: list[tuple[pd.Timestamp, pd.Timestamp]] = []
+    window_start = start
+    while window_start <= end:
+        window_end = min(
+            window_start + pd.DateOffset(years=TENCENT_WINDOW_YEARS) - pd.Timedelta(days=1),
+            end,
+        )
+        windows.append((window_start, pd.Timestamp(window_end).normalize()))
+        window_start = pd.Timestamp(window_end).normalize() + pd.Timedelta(days=1)
+    return windows
+
+
 def fetch_tencent(
     proxy: AssetProxy,
     start: pd.Timestamp,
     end: pd.Timestamp,
 ) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
-    for year in range(start.year, end.year + 1):
+    for index, (window_start, window_end) in enumerate(tencent_request_windows(start, end)):
         params = {
-            "_var": f"kline_dayqfq{year}",
-            "param": f"{proxy.market_symbol},day,{year}-01-01,{year}-12-31,640,qfq",
+            "_var": f"kline_dayqfq_{proxy.security}_{index}",
+            "param": (
+                f"{proxy.market_symbol},day,{window_start.date().isoformat()},"
+                f"{window_end.date().isoformat()},640,qfq"
+            ),
             "r": "0.8205512681390605",
         }
-        text = _request_text(SECONDARY_URL, params)
+        text = _request_text(
+            SECONDARY_URL,
+            params,
+            attempts=TENCENT_REQUEST_ATTEMPTS,
+            timeout=TENCENT_REQUEST_TIMEOUT_SECONDS,
+            backoff_base=2.0,
+            backoff_cap=16.0,
+        )
         separator = text.find("=")
         if separator < 0:
             raise DataGateClosed(f"SOURCE_SCHEMA_MISMATCH:{SECONDARY_PROVIDER}:{proxy.security}")
@@ -260,12 +299,198 @@ def _safe_relative_file(manifest_dir: Path, relative: str) -> Path:
     return candidate
 
 
+def _write_json_atomic(path: Path, payload: Mapping[str, object]) -> None:
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+    temporary.replace(path)
+
+
+def _checkpoint_identity(start: pd.Timestamp, as_of: pd.Timestamp) -> dict[str, object]:
+    return {
+        "schema_version": CHECKPOINT_SCHEMA_VERSION,
+        "collector_version": COLLECTOR_VERSION,
+        "requested_start": start.date().isoformat(),
+        "as_of": as_of.date().isoformat(),
+        "universe": [asdict(proxy) for proxy in PROXIES],
+    }
+
+
+def _load_or_create_checkpoint(
+    output_dir: Path,
+    raw_dir: Path,
+    start: pd.Timestamp,
+    as_of: pd.Timestamp,
+    resume: bool,
+) -> tuple[Path, dict[str, object]]:
+    checkpoint_path = output_dir / CHECKPOINT_FILENAME
+    expected_identity = _checkpoint_identity(start, as_of)
+    if checkpoint_path.exists():
+        if not resume:
+            raise DataGateClosed("NO_RESUME_REQUIRES_EMPTY_OUTPUT_DIRECTORY")
+        try:
+            checkpoint = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            raise DataGateClosed(f"RESUME_CHECKPOINT_UNREADABLE:{error}") from error
+        actual_identity = {key: checkpoint.get(key) for key in expected_identity}
+        if actual_identity != expected_identity:
+            raise DataGateClosed("RESUME_CHECKPOINT_IDENTITY_MISMATCH")
+        if not isinstance(checkpoint.get("completed_sources"), dict):
+            raise DataGateClosed("RESUME_CHECKPOINT_SCHEMA_MISMATCH")
+        return checkpoint_path, checkpoint
+
+    existing_outputs = [
+        path
+        for path in (
+            *raw_dir.glob("*.csv"),
+            output_dir / "returns.csv",
+            output_dir / "data_quality.csv",
+            output_dir / "data_manifest.json",
+        )
+        if path.exists()
+    ]
+    if existing_outputs:
+        raise DataGateClosed("UNATTESTED_EXISTING_OUTPUT_REQUIRES_NEW_DIRECTORY")
+    checkpoint = {
+        **expected_identity,
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "status": "IN_PROGRESS",
+        "completed_sources": {},
+    }
+    _write_json_atomic(checkpoint_path, checkpoint)
+    return checkpoint_path, checkpoint
+
+
+def _load_checkpoint_source(
+    output_dir: Path,
+    checkpoint: Mapping[str, object],
+    relative_path: str,
+    source_label: str,
+    start: pd.Timestamp,
+    as_of: pd.Timestamp,
+) -> pd.DataFrame | None:
+    completed = checkpoint.get("completed_sources") or {}
+    entry = completed.get(relative_path) if isinstance(completed, dict) else None
+    if entry is None:
+        return None
+    if not isinstance(entry, dict) or entry.get("source_label") != source_label:
+        raise DataGateClosed(f"RESUME_SOURCE_IDENTITY_MISMATCH:{relative_path}")
+    path = output_dir / relative_path
+    if not path.is_file() or entry.get("sha256") != sha256_file(path):
+        raise DataGateClosed(f"RESUME_SOURCE_HASH_MISMATCH:{relative_path}")
+    try:
+        frame = _normalize_ohlc(pd.read_csv(path), f"RESUME:{source_label}")
+    except (OSError, ValueError, pd.errors.ParserError) as error:
+        raise DataGateClosed(f"RESUME_SOURCE_UNREADABLE:{relative_path}:{error}") from error
+    frame = frame.loc[frame["date"].between(start, as_of)].reset_index(drop=True)
+    if frame.empty:
+        raise DataGateClosed(f"RESUME_SOURCE_EMPTY_AFTER_DATE_FILTER:{relative_path}")
+    integrity = _frame_integrity(frame, start, as_of)
+    expected_metadata = {
+        "rows": integrity["rows"],
+        "first_date": integrity["first_date"],
+        "last_date": integrity["last_date"],
+    }
+    actual_metadata = {key: entry.get(key) for key in expected_metadata}
+    if actual_metadata != expected_metadata:
+        raise DataGateClosed(f"RESUME_SOURCE_METADATA_MISMATCH:{relative_path}")
+    if not (
+        integrity["covers_requested_start"]
+        and integrity["freshness_passed"]
+        and integrity["integrity_passed"]
+    ):
+        raise DataGateClosed(f"RESUME_SOURCE_INTEGRITY_FAILED:{relative_path}")
+    return frame
+
+
+def _persist_checkpoint_source(
+    output_dir: Path,
+    checkpoint_path: Path,
+    checkpoint: dict[str, object],
+    relative_path: str,
+    source_label: str,
+    frame: pd.DataFrame,
+    start: pd.Timestamp,
+    as_of: pd.Timestamp,
+) -> pd.DataFrame:
+    frame = _normalize_ohlc(frame, source_label)
+    frame = frame.loc[frame["date"].between(start, as_of)].reset_index(drop=True)
+    if frame.empty:
+        raise DataGateClosed(f"SOURCE_EMPTY_AFTER_DATE_FILTER:{source_label}")
+    integrity = _frame_integrity(frame, start, as_of)
+    if not (
+        integrity["covers_requested_start"]
+        and integrity["freshness_passed"]
+        and integrity["integrity_passed"]
+    ):
+        raise DataGateClosed(f"SOURCE_INTEGRITY_OR_FRESHNESS_FAILED:{source_label}")
+
+    path = output_dir / relative_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    frame.to_csv(temporary, index=False)
+    temporary.replace(path)
+    completed = checkpoint.setdefault("completed_sources", {})
+    if not isinstance(completed, dict):
+        raise DataGateClosed("RESUME_CHECKPOINT_SCHEMA_MISMATCH")
+    completed[relative_path] = {
+        "source_label": source_label,
+        "sha256": sha256_file(path),
+        "rows": integrity["rows"],
+        "first_date": integrity["first_date"],
+        "last_date": integrity["last_date"],
+        "completed_at_utc": datetime.now(timezone.utc).isoformat(),
+    }
+    checkpoint["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
+    checkpoint["status"] = "IN_PROGRESS"
+    _write_json_atomic(checkpoint_path, checkpoint)
+    return frame
+
+
+def _load_or_fetch_source(
+    output_dir: Path,
+    checkpoint_path: Path,
+    checkpoint: dict[str, object],
+    relative_path: str,
+    source_label: str,
+    start: pd.Timestamp,
+    as_of: pd.Timestamp,
+    fetch: Callable[[], pd.DataFrame],
+    resume: bool,
+) -> pd.DataFrame:
+    if resume:
+        cached = _load_checkpoint_source(
+            output_dir,
+            checkpoint,
+            relative_path,
+            source_label,
+            start,
+            as_of,
+        )
+        if cached is not None:
+            return cached
+    return _persist_checkpoint_source(
+        output_dir,
+        checkpoint_path,
+        checkpoint,
+        relative_path,
+        source_label,
+        fetch(),
+        start,
+        as_of,
+    )
+
+
 def build_production_panel(
     start: pd.Timestamp,
     as_of: pd.Timestamp,
     output_dir: Path,
     primary_fetcher: PrimaryFetcher = fetch_eastmoney,
     secondary_fetcher: SecondaryFetcher = fetch_tencent,
+    resume: bool = True,
 ) -> Path:
     start = pd.Timestamp(start).normalize()
     as_of = pd.Timestamp(as_of).normalize()
@@ -274,23 +499,82 @@ def build_production_panel(
     output_dir.mkdir(parents=True, exist_ok=True)
     raw_dir = output_dir / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_path, checkpoint = _load_or_create_checkpoint(
+        output_dir,
+        raw_dir,
+        start,
+        as_of,
+        resume,
+    )
+    existing_manifest_path = output_dir / "data_manifest.json"
+    existing_returns_path = output_dir / "returns.csv"
+    if (
+        resume
+        and checkpoint.get("status") == "SOURCES_COMPLETE"
+        and existing_manifest_path.exists()
+    ):
+        try:
+            existing_returns = pd.read_csv(
+                existing_returns_path,
+                parse_dates=["date"],
+            ).set_index("date")
+            validate_production_manifest(
+                existing_returns,
+                existing_returns_path,
+                existing_manifest_path,
+                as_of,
+            )
+        except (
+            ResearchClosed,
+            OSError,
+            ValueError,
+            KeyError,
+            pd.errors.ParserError,
+        ) as error:
+            raise DataGateClosed(f"EXISTING_FINAL_PACKET_INVALID:{error}") from error
+        return existing_manifest_path
 
     adjusted_frames: list[pd.DataFrame] = []
     quality_rows: list[dict[str, object]] = []
     raw_hashes: dict[str, str] = {}
 
     for proxy in PROXIES:
-        primary_qfq = _normalize_ohlc(
-            primary_fetcher(proxy, start, as_of, "qfq"),
-            f"{PRIMARY_PROVIDER}:{proxy.security}:qfq",
+        prefix = f"raw/{proxy.asset}_{proxy.security}"
+        primary_qfq_label = f"{PRIMARY_PROVIDER}:{proxy.security}:qfq"
+        primary_qfq = _load_or_fetch_source(
+            output_dir,
+            checkpoint_path,
+            checkpoint,
+            f"{prefix}_eastmoney_qfq.csv",
+            primary_qfq_label,
+            start,
+            as_of,
+            lambda proxy=proxy: primary_fetcher(proxy, start, as_of, "qfq"),
+            resume,
         )
-        primary_raw = _normalize_ohlc(
-            primary_fetcher(proxy, start, as_of, "unadjusted"),
-            f"{PRIMARY_PROVIDER}:{proxy.security}:unadjusted",
+        primary_raw_label = f"{PRIMARY_PROVIDER}:{proxy.security}:unadjusted"
+        primary_raw = _load_or_fetch_source(
+            output_dir,
+            checkpoint_path,
+            checkpoint,
+            f"{prefix}_eastmoney_unadjusted.csv",
+            primary_raw_label,
+            start,
+            as_of,
+            lambda proxy=proxy: primary_fetcher(proxy, start, as_of, "unadjusted"),
+            resume,
         )
-        secondary_qfq = _normalize_ohlc(
-            secondary_fetcher(proxy, start, as_of),
-            f"{SECONDARY_PROVIDER}:{proxy.security}:qfq",
+        secondary_qfq_label = f"{SECONDARY_PROVIDER}:{proxy.security}:qfq"
+        secondary_qfq = _load_or_fetch_source(
+            output_dir,
+            checkpoint_path,
+            checkpoint,
+            f"{prefix}_tencent_qfq.csv",
+            secondary_qfq_label,
+            start,
+            as_of,
+            lambda proxy=proxy: secondary_fetcher(proxy, start, as_of),
+            resume,
         )
         frames = {
             "eastmoney_qfq": primary_qfq,
@@ -299,7 +583,6 @@ def build_production_panel(
         }
         for label, frame in frames.items():
             path = raw_dir / f"{proxy.asset}_{proxy.security}_{label}.csv"
-            frame.to_csv(path, index=False)
             raw_hashes[str(path.relative_to(output_dir))] = sha256_file(path)
 
         primary_integrity = _frame_integrity(primary_qfq, start, as_of)
@@ -339,6 +622,10 @@ def build_production_panel(
         selected = primary_qfq[["date", "close"]].copy()
         selected["asset"] = proxy.asset
         adjusted_frames.append(selected)
+
+    checkpoint["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
+    checkpoint["status"] = "SOURCES_COMPLETE"
+    _write_json_atomic(checkpoint_path, checkpoint)
 
     quality = pd.DataFrame(quality_rows)
     quality_path = output_dir / "data_quality.csv"
@@ -414,6 +701,11 @@ def build_production_panel(
         "quality": {
             "path": quality_path.name,
             "sha256": sha256_file(quality_path),
+        },
+        "collection_checkpoint": {
+            "path": checkpoint_path.name,
+            "sha256": sha256_file(checkpoint_path),
+            "status": "SOURCES_COMPLETE",
         },
         "raw_file_hashes": raw_hashes,
         "gates": {
@@ -506,6 +798,38 @@ def validate_production_manifest(
     }
     if set(raw_hashes) != expected_raw_paths:
         raise ResearchClosed("RAW_SOURCE_PACKET_INCOMPLETE")
+
+    requested_start = pd.Timestamp(manifest.get("requested_start")).normalize()
+    checkpoint_metadata = manifest.get("collection_checkpoint") or {}
+    checkpoint_path = _safe_relative_file(
+        manifest_dir,
+        str(checkpoint_metadata.get("path", "")),
+    )
+    if (
+        checkpoint_metadata.get("status") != "SOURCES_COMPLETE"
+        or not checkpoint_path.is_file()
+        or checkpoint_metadata.get("sha256") != sha256_file(checkpoint_path)
+    ):
+        raise ResearchClosed("COLLECTION_CHECKPOINT_HASH_OR_STATUS_MISMATCH")
+    try:
+        checkpoint = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ResearchClosed(f"COLLECTION_CHECKPOINT_UNREADABLE:{error}") from error
+    expected_checkpoint_identity = _checkpoint_identity(requested_start, cutoff)
+    actual_checkpoint_identity = {
+        key: checkpoint.get(key) for key in expected_checkpoint_identity
+    }
+    completed_sources = checkpoint.get("completed_sources") or {}
+    if (
+        actual_checkpoint_identity != expected_checkpoint_identity
+        or checkpoint.get("status") != "SOURCES_COMPLETE"
+        or not isinstance(completed_sources, dict)
+        or set(completed_sources) != expected_raw_paths
+    ):
+        raise ResearchClosed("COLLECTION_CHECKPOINT_IDENTITY_MISMATCH")
+    for relative_path, expected_hash in raw_hashes.items():
+        if (completed_sources.get(relative_path) or {}).get("sha256") != expected_hash:
+            raise ResearchClosed(f"COLLECTION_CHECKPOINT_SOURCE_MISMATCH:{relative_path}")
     for relative, expected_hash in sorted(raw_hashes.items()):
         raw_path = _safe_relative_file(manifest_dir, relative)
         if not raw_path.is_file() or sha256_file(raw_path) != expected_hash:
@@ -513,7 +837,6 @@ def validate_production_manifest(
 
     # Do not trust attested booleans alone. Recompute the source and derivation
     # gates from the frozen raw packet that was just hash-verified.
-    requested_start = pd.Timestamp(manifest.get("requested_start")).normalize()
     reconstructed_frames: list[pd.DataFrame] = []
     recomputed_quality: list[dict[str, object]] = []
     for proxy in PROXIES:
