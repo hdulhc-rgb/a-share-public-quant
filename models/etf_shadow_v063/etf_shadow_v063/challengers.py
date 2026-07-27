@@ -76,7 +76,11 @@ def _cluster_variance(cov: pd.DataFrame, items: list[str]) -> float:
 def hierarchical_risk_parity(returns: pd.DataFrame) -> ChallengerResult:
     cov = returns.cov()
     corr = returns.corr().fillna(0.0).clip(-1.0, 1.0)
-    np.fill_diagonal(corr.values, 1.0)
+    # pandas 3 may expose a read-only ndarray through ``DataFrame.values``.
+    # Build an explicit writable copy before normalizing the diagonal.
+    corr_values = corr.to_numpy(dtype=float, copy=True)
+    np.fill_diagonal(corr_values, 1.0)
+    corr = pd.DataFrame(corr_values, index=corr.index, columns=corr.columns)
     if not np.isfinite(cov.to_numpy()).all() or not np.isfinite(corr.to_numpy()).all():
         return ChallengerResult("hrp", None, "NOT_EVALUABLE", "HRP", "NON_FINITE_COVARIANCE")
     distance = np.sqrt(np.maximum(0.0, (1.0 - corr.to_numpy(dtype=float)) / 2.0))
