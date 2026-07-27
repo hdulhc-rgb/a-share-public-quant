@@ -83,7 +83,8 @@ def main() -> int:
                 pd.Series(np.full(len(assets), 1.0 / len(assets)), index=assets),
                 assets,
             )
-            current = benchmark.copy()
+            historical_anchor = benchmark.copy()
+            live_current = benchmark.copy()
         else:
             if args.current_weights is None or args.benchmark_weights is None:
                 raise ResearchClosed(
@@ -96,11 +97,15 @@ def main() -> int:
                 as_of=pd.Timestamp(args.as_of),
             )
             benchmark = load_weight_file(args.benchmark_weights, assets)
-            current = load_weight_file(args.current_weights, assets)
+            # The preregistered benchmark is the only historical turnover anchor
+            # until a timestamped point-in-time weight ledger is supplied.
+            historical_anchor = benchmark.copy()
+            live_current = load_weight_file(args.current_weights, assets)
         run_dir = run_research(
             returns=returns,
             benchmark=benchmark,
-            current=current,
+            historical_anchor=historical_anchor,
+            live_current=live_current,
             as_of=pd.Timestamp(args.as_of),
             output_root=args.output_root,
             source_path=args.returns_csv,

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -9,10 +8,9 @@ from typing import Mapping
 import numpy as np
 import pandas as pd
 
-from .backtest import differential_check, metrics, stability_score, vectorized_returns
-from .challengers import CHALLENGERS, INVERSE_VOLATILITY_FLOOR_ANNUAL, build_challenger
-from .core import (
-    MODEL_VERSION,
+from etf_shadow_v063.backtest import differential_check, metrics, stability_score, vectorized_returns
+from etf_shadow_v063.challengers import CHALLENGERS, INVERSE_VOLATILITY_FLOOR_ANNUAL, build_challenger
+from etf_shadow_v063.core import (
     ResearchClosed,
     ResearchPolicy,
     annual_tracking_error,
@@ -29,7 +27,10 @@ from .core import (
     validate_returns,
     write_json,
 )
-from .validation import anchored_walk_forward, combinatorial_purged_cv
+from etf_shadow_v063.validation import anchored_walk_forward, combinatorial_purged_cv
+
+from .data_contract import MODEL_VERSION, return_basis_diagnostics
+from .external_validation import run_external_validation
 
 
 def _aggregate(rows: list[dict[str, object]], challenger: str) -> dict[str, object]:
@@ -52,42 +53,65 @@ def _aggregate(rows: list[dict[str, object]], challenger: str) -> dict[str, obje
     }
 
 
-def run_research(
-    returns: pd.DataFrame,
+def run_research_data2(
+    economic_returns: pd.DataFrame,
+    execution_returns: pd.DataFrame,
     benchmark: pd.Series,
     historical_anchor: pd.Series,
     live_current: pd.Series,
     as_of: pd.Timestamp,
     output_root: Path,
-    source_path: Path | None,
-    source_id: str,
+    economic_source_path: Path | None,
+    execution_source_path: Path | None,
+    economic_source_id: str,
+    execution_source_id: str,
     policy: ResearchPolicy,
-    optional_engines: str = "record",
-    source_attestation: Mapping[str, object] | None = None,
+    profile: str,
+    data2_assessment: Mapping[str, object],
+    economic_source_attestation: Mapping[str, object] | None,
+    execution_source_attestation: Mapping[str, object],
+    local_proxy_evidence: Mapping[str, object] | None = None,
+    qdii_evidence: Mapping[str, object] | None = None,
     historical_anchor_source: str = "PREREGISTERED_STRATEGIC_BENCHMARK",
 ) -> Path:
-    validate_returns(returns, as_of, policy.min_train_observations + policy.test_observations)
+    validate_returns(economic_returns, as_of, policy.min_train_observations + policy.test_observations)
+    validate_returns(execution_returns, as_of, policy.min_train_observations + policy.test_observations)
+    if not economic_returns.index.equals(execution_returns.index):
+        raise ResearchClosed("DATA2_DUAL_PANEL_CALENDAR_MISMATCH")
+    if list(economic_returns.columns) != list(execution_returns.columns):
+        raise ResearchClosed("DATA2_DUAL_PANEL_ASSET_MISMATCH")
     challenger_names = list(CHALLENGERS)
     if len(challenger_names) > policy.parameter_budget:
         raise ResearchClosed("PARAMETER_BUDGET_EXCEEDED")
 
-    optional = {name: bool(importlib.util.find_spec(name)) for name in ["skfolio", "vectorbt"]}
-    if optional_engines == "require" and not all(optional.values()):
-        raise ResearchClosed("OPTIONAL_RESEARCH_ENGINE_DEPENDENCY_MISSING")
-
     timestamp = utc_now()
-    run_id = f"v063_{as_of.strftime('%Y%m%d')}_{timestamp.strftime('%H%M%S')}_{stable_json_hash({'as_of': as_of.isoformat(), 'n': len(returns), 'hash': float(returns.iloc[-1].sum())})[:8]}"
+    run_id = f"v063d2_{as_of.strftime('%Y%m%d')}_{timestamp.strftime('%H%M%S')}_{stable_json_hash({'as_of': as_of.isoformat(), 'n': len(economic_returns), 'economic': float(economic_returns.iloc[-1].sum()), 'execution': float(execution_returns.iloc[-1].sum())})[:8]}"
     run_dir = create_run_directory(output_root, run_id)
     started = timestamp.isoformat()
-    fingerprint = data_fingerprint(
-        returns,
-        source_path,
+    economic_fingerprint = data_fingerprint(
+        economic_returns,
+        economic_source_path,
         as_of,
-        source_id,
-        source_attestation=source_attestation,
+        economic_source_id,
+        source_attestation=economic_source_attestation,
     )
-    write_json(run_dir / "data_fingerprint.json", fingerprint)
-    write_json(run_dir / "dependency_gates.json", {"optional_engines": optional, "policy": optional_engines, "silent_fallback": False})
+    execution_fingerprint = data_fingerprint(
+        execution_returns,
+        execution_source_path,
+        as_of,
+        execution_source_id,
+        source_attestation=execution_source_attestation,
+    )
+    combined_fingerprint = {
+        "model_version": MODEL_VERSION,
+        "economic": economic_fingerprint,
+        "execution": execution_fingerprint,
+        "calendar_identical": True,
+        "asset_identity_identical": True,
+        "data_grade": data2_assessment["data_grade"],
+        "promotion_gate_passed": data2_assessment["promotion_gate_passed"],
+    }
+    write_json(run_dir / "data_fingerprint.json", combined_fingerprint)
     write_json(run_dir / "pre_registration.json", {
         "model_version": MODEL_VERSION,
         "primary_validation": "ANCHORED_WALK_FORWARD",
@@ -98,6 +122,9 @@ def run_research(
         "risk_measures": ["CVaR95", "CDaR95", "MaxDrawdown", "TrackingError", "Turnover"],
         "inverse_volatility_floor_annual": INVERSE_VOLATILITY_FLOOR_ANNUAL,
         "inverse_volatility_floor_policy": "EXPLICIT_FLOOR_FOR_ZERO_OR_NEAR_ZERO_VOLATILITY_ASSETS; RECORD_FLOORED_ASSETS_IN_TRACE",
+        "return_basis_policy": "BUILD_ON_ECONOMIC_RETURNS; CONSTRAIN_AND_SCORE_ON_EXECUTION_RETURNS",
+        "data_profile": profile,
+        "data_grade_policy": "GRADE_B_ALLOWED_ONLY_UNDER_RESEARCH_LOCK; GRADE_A_REQUIRED_FOR_PROMOTION",
         "point_in_time_private_state_policy": {
             "historical_validation_anchor_source": historical_anchor_source,
             "historical_validation_uses_live_current": False,
@@ -105,7 +132,16 @@ def run_research(
         },
     })
 
-    wf_splits = anchored_walk_forward(len(returns), policy.min_train_observations, policy.test_observations, policy.walk_forward_step)
+    return_basis_diagnostics(economic_returns, execution_returns).to_csv(
+        run_dir / "return_basis_diagnostics.csv", index=False
+    )
+    write_json(run_dir / "data2_gate.json", {
+        **dict(data2_assessment),
+        "local_proxy": dict(local_proxy_evidence) if local_proxy_evidence is not None else None,
+        "qdii_decomposition": dict(qdii_evidence) if qdii_evidence is not None else None,
+    })
+
+    wf_splits = anchored_walk_forward(len(economic_returns), policy.min_train_observations, policy.test_observations, policy.walk_forward_step)
     if not wf_splits:
         raise ResearchClosed("NO_WALK_FORWARD_SPLITS")
     rows: list[dict[str, object]] = []
@@ -113,17 +149,19 @@ def run_research(
     trace_rows: list[dict[str, object]] = []
     replay_rows: list[dict[str, object]] = []
     weight_history: dict[str, list[pd.Series]] = defaultdict(list)
+    combined_snapshot_hash = stable_json_hash(combined_fingerprint)
 
     for split in wf_splits:
-        train = returns.iloc[split.train]
-        test = returns.iloc[split.test]
-        signal_time = train.index[-1]
-        execution_time = next_tradable_time(returns.index, signal_time)
-        if execution_time != test.index[0]:
+        train_economic = economic_returns.iloc[split.train]
+        train_execution = execution_returns.iloc[split.train]
+        test_execution = execution_returns.iloc[split.test]
+        signal_time = train_economic.index[-1]
+        execution_time = next_tradable_time(economic_returns.index, signal_time)
+        if execution_time != test_execution.index[0]:
             raise ResearchClosed("WALK_FORWARD_EXECUTION_ALIGNMENT_FAILED")
-        covariance = train.cov()
+        covariance = train_execution.cov()
         for name in challenger_names:
-            result = build_challenger(name, train)
+            result = build_challenger(name, train_economic)
             trace_rows.append({
                 "split_id": split.split_id,
                 "candidate": name,
@@ -134,7 +172,7 @@ def run_research(
                 "threshold": "OK",
                 "observed": result.status,
                 "evidence_gap": "" if result.status == "OK" else result.message,
-                "source_ref": fingerprint["normalized_panel_sha256"],
+                "source_ref": combined_snapshot_hash,
                 "method": result.method,
                 "diagnostics": result.diagnostics,
             })
@@ -148,15 +186,15 @@ def run_research(
                 te_constrained,
                 policy.one_way_turnover_max,
             )
-            diff = differential_check(test, actual, policy.differential_tolerance)
+            diff = differential_check(test_execution, actual, policy.differential_tolerance)
             if diff["status"] != "PASS":
                 raise ResearchClosed("DIFFERENTIAL_BACKTEST_DIVERGENCE")
-            score = metrics(vectorized_returns(test, actual), float(turn_info["actual_turnover"]), policy.transaction_cost_bps)
+            score = metrics(vectorized_returns(test_execution, actual), float(turn_info["actual_turnover"]), policy.transaction_cost_bps)
             row = {
                 "split_id": split.split_id,
                 "signal_time": signal_time.isoformat(),
                 "execution_time": execution_time.isoformat(),
-                "test_end": test.index[-1].isoformat(),
+                "test_end": test_execution.index[-1].isoformat(),
                 "challenger": name,
                 "historical_anchor_source": historical_anchor_source,
                 "status": "OK",
@@ -182,11 +220,11 @@ def run_research(
                 "split_id": split.split_id,
                 "challenger": name,
                 "state": "CLOSED_REPLAY",
-                "frozen_snapshot_hash": fingerprint["normalized_panel_sha256"],
-                "candidate_universe_hash": stable_json_hash(list(returns.columns)),
+                "frozen_snapshot_hash": combined_snapshot_hash,
+                "candidate_universe_hash": stable_json_hash(list(economic_returns.columns)),
                 "signal_time": signal_time.isoformat(),
                 "execution_time": execution_time.isoformat(),
-                "holding_period_end": test.index[-1].isoformat(),
+                "holding_period_end": test_execution.index[-1].isoformat(),
                 "net_total_return": score["total_return"],
                 "no_auto_promotion": True,
             })
@@ -211,15 +249,16 @@ def run_research(
     pd.DataFrame(constraint_rows).to_csv(run_dir / "constraint_diagnostics.csv", index=False)
 
     cpcv_rows: list[dict[str, object]] = []
-    cpcv_splits = combinatorial_purged_cv(len(returns), policy.cpcv_folds, policy.cpcv_test_folds, policy.cpcv_embargo_observations, max_paths=max(1, policy.parameter_budget // max(len(challenger_names), 1) * len(challenger_names)))
+    cpcv_splits = combinatorial_purged_cv(len(economic_returns), policy.cpcv_folds, policy.cpcv_test_folds, policy.cpcv_embargo_observations, max_paths=max(1, policy.parameter_budget // max(len(challenger_names), 1) * len(challenger_names)))
     for split in cpcv_splits:
-        train = returns.iloc[split.train]
-        test = returns.iloc[split.test]
-        if len(train) < policy.min_train_observations:
+        train_economic = economic_returns.iloc[split.train]
+        train_execution = execution_returns.iloc[split.train]
+        test_execution = execution_returns.iloc[split.test]
+        if len(train_economic) < policy.min_train_observations:
             continue
-        covariance = train.cov()
+        covariance = train_execution.cov()
         for name in challenger_names:
-            result = build_challenger(name, train)
+            result = build_challenger(name, train_economic)
             if result.status != "OK" or result.weights is None:
                 cpcv_rows.append({"split_id": split.split_id, "challenger": name, "status": result.status})
                 continue
@@ -229,7 +268,7 @@ def run_research(
                 target,
                 policy.one_way_turnover_max,
             )
-            score = metrics(vectorized_returns(test.sort_index(), actual), float(turn_info["actual_turnover"]), policy.transaction_cost_bps)
+            score = metrics(vectorized_returns(test_execution.sort_index(), actual), float(turn_info["actual_turnover"]), policy.transaction_cost_bps)
             cpcv_rows.append({
                 "split_id": split.split_id,
                 "challenger": name,
@@ -265,7 +304,7 @@ def run_research(
         for record in replay_rows:
             handle.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
 
-    final_test = returns.iloc[wf_splits[-1].test]
+    final_test = execution_returns.iloc[wf_splits[-1].test]
     attribution_target_name = "equal_weight"
     attribution_weights = weight_history[attribution_target_name][-1]
     transaction_cost = (
@@ -306,12 +345,30 @@ def run_research(
             raise ResearchClosed("ATTRIBUTION_IDENTITY_FAILED")
     pd.DataFrame(attribution_rows).to_csv(run_dir / "performance_attribution.csv", index=False)
 
-    live_signal_time = returns.index[-1]
-    live_covariance = returns.cov()
+    external_validation = run_external_validation(
+        returns=execution_returns,
+        weights=historical_anchor,
+        profile=profile,
+    )
+    write_json(run_dir / "external_validation.json", external_validation)
+    write_json(run_dir / "dependency_gates.json", external_validation)
+
+    module_root = Path(__file__).resolve().parents[1]
+    frozen_code_paths = sorted(Path(__file__).parent.glob("*.py")) + [
+        module_root / "run_shadow_v0_6_3_data2.py",
+        module_root / "build_local_proxy.py",
+        module_root / "PRE_REGISTRATION.md",
+    ]
+    code_hashes = {
+        path.relative_to(module_root).as_posix(): sha256_file(path)
+        for path in frozen_code_paths
+    }
+    live_signal_time = economic_returns.index[-1]
+    live_covariance = execution_returns.cov()
     live_targets: dict[str, dict[str, float]] = {}
     live_target_rows: list[dict[str, object]] = []
     for name in challenger_names:
-        result = build_challenger(name, returns)
+        result = build_challenger(name, economic_returns)
         if result.status != "OK" or result.weights is None:
             live_target_rows.append({
                 "signal_time": live_signal_time.isoformat(),
@@ -342,20 +399,23 @@ def run_research(
             **te_info,
             **turn_info,
         })
-    live_target_frame = pd.DataFrame(live_target_rows)
-    live_target_frame.to_csv(run_dir / "live_target_diagnostics.csv", index=False)
+    pd.DataFrame(live_target_rows).to_csv(
+        run_dir / "live_target_diagnostics.csv", index=False
+    )
 
     decision_snapshot = {
         "run_id": run_id,
         "model_version": MODEL_VERSION,
         "status": "ACTIVE_SHADOW_LOCKED",
         "signal_date": live_signal_time.isoformat(),
+        "signal_date_semantics": "LATEST_COMMON_CLOSE_LIVE_SHADOW_SIGNAL; NOT_AN_ORDER",
         "as_of_cutoff": as_of.isoformat(),
         "next_tradable_time": None,
         "execution_timing_policy": "NEXT_COMMON_TRADABLE_SESSION_AFTER_SIGNAL_DATE; NOT_INFERRED_WITHOUT_A_FORWARD_CALENDAR",
-        "data_fingerprint": fingerprint,
+        "data_fingerprint": combined_fingerprint,
+        "data2_assessment": dict(data2_assessment),
         "policy_hash": stable_json_hash(policy_dict(policy)),
-        "code_hashes": {path.name: sha256_file(path) for path in sorted(Path(__file__).parent.glob("*.py"))},
+        "code_hashes": code_hashes,
         "previous_actual_shadow_weights": {asset: float(value) for asset, value in live_current.items()},
         "benchmark_weights": {asset: float(value) for asset, value in benchmark.items()},
         "challenger_actual_shadow_targets": live_targets,
@@ -366,14 +426,14 @@ def run_research(
                 asset: float(value) for asset, value in historical_anchor.items()
             },
             "uses_live_current": False,
-            "latest_closed_signal_time": returns.index[wf_splits[-1].train[-1]].isoformat(),
-            "latest_closed_execution_time": returns.index[wf_splits[-1].test[0]].isoformat(),
-            "latest_closed_test_end": returns.index[wf_splits[-1].test[-1]].isoformat(),
+            "latest_closed_signal_time": economic_returns.index[wf_splits[-1].train[-1]].isoformat(),
+            "latest_closed_execution_time": economic_returns.index[wf_splits[-1].test[0]].isoformat(),
+            "latest_closed_test_end": economic_returns.index[wf_splits[-1].test[-1]].isoformat(),
         },
         "live_target_diagnostics": "live_target_diagnostics.csv",
         "champion": "v0.4.1_EXTERNAL_NOT_REPLACED",
         "v0.6.2": "EXTERNAL_BASELINE_NOT_REPLACED",
-        "v0.6.3_role": "CHALLENGER_RESEARCH_ONLY",
+        "v0.6.3_data2_role": "DUAL_RETURN_CHALLENGER_RESEARCH_ONLY",
         "promotion": "NO_AUTO_PROMOTION",
         "broker_connection": False,
         "orders_generated": False,
@@ -385,12 +445,13 @@ def run_research(
         "status": "PASS" if all(row["differential_status"] == "PASS" for row in differential_records) else "FAIL",
         "tolerance": policy.differential_tolerance,
         "records": differential_records,
-        "vectorbt_adapter": "AVAILABLE" if optional["vectorbt"] else "DEPENDENCY_MISSING",
+        "vectorbt_adapter": external_validation["vectorbt"]["status"],
         "silent_fallback": False,
     })
 
     required_files = [
-        "data_fingerprint.json", "dependency_gates.json", "pre_registration.json", "walk_forward_results.csv",
+        "data_fingerprint.json", "data2_gate.json", "dependency_gates.json", "external_validation.json",
+        "return_basis_diagnostics.csv", "pre_registration.json", "walk_forward_results.csv",
         "challenge_matrix.csv", "stability_regions.csv", "constraint_diagnostics.csv", "cpcv_results.csv",
         "candidate_filter_trace.jsonl", "rejected_candidates.csv", "shadow_replay.csv", "shadow_replay.jsonl",
         "performance_attribution.csv", "live_target_diagnostics.csv", "decision_snapshot.json",
@@ -413,6 +474,8 @@ def run_research(
         "integrity": "PASS",
         "point_in_time_private_state_gate": "PASS",
         "historical_validation_uses_live_current": False,
+        "data_grade": data2_assessment["data_grade"],
+        "promotion_gate_passed": data2_assessment["promotion_gate_passed"],
         "artifacts": artifacts,
         "research_lock": True,
         "broker_connection": False,
