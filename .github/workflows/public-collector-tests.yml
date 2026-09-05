@@ -1,0 +1,35 @@
+name: public-collector-tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  adapter-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: adapter
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 6ad8c97af188604cd83f0c5daada15eeda9e6aa7
+          path: model
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          python -m pip install -r adapter/scripts/public-collector-requirements.txt
+          cp adapter/scripts/collect_public_snapshot.py adapter/scripts/public_collector_identity.json model/scripts/
+          mkdir -p model/tests
+          cp adapter/tests/test_public_collector.py model/tests/
+          python adapter/scripts/privacy_guard.py
+          python -m unittest discover -s model/tests -v
+          PYTHONPATH=model/models/etf_shadow_v063 python -m unittest discover -s model/models/etf_shadow_v063/tests -v
