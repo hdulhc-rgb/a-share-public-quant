@@ -344,6 +344,7 @@ def collect(state, as_of, required_cutoff, run_id, primary=dp.fetch_eastmoney,
         if prior:
             old = validate_packet(prior)
             if old["as_of"] == as_of and old["return_panel"]["max_date"] == required_cutoff:
+                packet = prior
                 receipt.update(status="NO_ACTION", run_path="FAST_NO_DELTA", packet=str(prior.relative_to(state)))
                 return receipt
             if pd.Timestamp(old["as_of"]) >= pd.Timestamp(as_of):

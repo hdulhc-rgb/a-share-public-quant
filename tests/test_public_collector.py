@@ -120,6 +120,9 @@ class CollectorTests(unittest.TestCase):
         r = self.run_collection(run_id="run2")
         self.assertEqual(r["status"], "NO_ACTION")
         self.assertEqual(self.calls, [])
+        self.assertEqual(self.state / r["packet"], c.resolve_success(self.state))
+        self.assertEqual(json.loads((self.state / "latest_attempt.json").read_text())["packet"], r["packet"])
+        self.assertTrue((self.state / r["packet"] / "data_manifest.json").is_file())
 
     def test_stale_cutoff_rejected_even_inside_legacy_seven_day_gate(self):
         self.primary_orig = self.primary
