@@ -1,0 +1,7 @@
+{
+  "schema": "PUBLIC_STATE_REPAIR_V1",
+  "reason": "Restore successful checkpoint bytes altered by relative-path error handling",
+  "original_verified_commit": "bb5149c1753dee02d0403b0a3a03adac7db0bd32",
+  "checkpoint_sha256": "5365e6abde4c74f4e7806332ce426d6b0bcd0ea78038731d07996bb13c955883",
+  "model_outputs_recomputed": false
+}

@@ -124,10 +124,9 @@
     }
   },
   "created_at_utc": "2026-09-05T05:52:46.340192+00:00",
-  "failure": "ValueError:'/home/runner/work/a-share-public-quant/a-share-public-quant/state/public_state/runs/public_33947987626_3/full' is not in the subpath of 'state/public_state'",
   "requested_start": "2016-12-01",
   "schema_version": "1.0",
-  "status": "FAILED_CLOSED",
+  "status": "SOURCES_COMPLETE",
   "universe": [
     {
       "asset": "A_SHARE",
@@ -160,5 +159,5 @@
       "security": "511880"
     }
   ],
-  "updated_at_utc": "2026-09-05T06:09:24.843413+00:00"
+  "updated_at_utc": "2026-09-05T05:52:56.988684+00:00"
 }

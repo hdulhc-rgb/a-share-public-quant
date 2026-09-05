@@ -2,7 +2,7 @@
   "adapter_version": "public-collector-1.1",
   "as_of": "2026-09-05",
   "broker_connection": false,
-  "failure": null,
+  "failure": "ValueError:ABSOLUTE_PACKET_RELATIVE_STATE_ROOT_MISMATCH",
   "model_commit": "6ad8c97af188604cd83f0c5daada15eeda9e6aa7",
   "orders_generated": false,
   "required_cutoff": "2026-09-04",
@@ -11,5 +11,12 @@
   "schema": "PUBLIC_SNAPSHOT_ATTEMPT_V1",
   "source_requests": [],
   "started_at": "2026-09-05T06:09:24.516219+00:00",
-  "status": "RUNNING"
+  "status": "FAILED_CLOSED",
+  "failed_stage": "BASE_PACKET_PATH_RESOLUTION",
+  "failure_classification": "INTEGRITY_OR_RUNTIME_FAILURE",
+  "finished_at": "2026-09-05T06:09:24.921016+00:00",
+  "terminal_correction": {
+    "reason": "Workflow completed with failure; original running receipt was not finalized",
+    "workflow_run_id": 33949029463
+  }
 }
