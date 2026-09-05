@@ -1,0 +1,97 @@
+name: public-collector
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/public-collector.yml'
+      - 'scripts/collect_public_snapshot.py'
+      - 'scripts/public_collector_identity.json'
+      - 'scripts/public-collector-requirements.txt'
+  schedule:
+    - cron: '0 2 * * 6' # Saturday 10:00 Asia/Shanghai, ahead of the 10:30 consumer
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: public-collector
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: adapter
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 6ad8c97af188604cd83f0c5daada15eeda9e6aa7
+          path: model
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          path: state
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: adapter/scripts/public-collector-requirements.txt
+      - name: Prepare immutable model and adapter
+        run: |
+          python -m pip install -r adapter/scripts/public-collector-requirements.txt
+          cp adapter/scripts/collect_public_snapshot.py adapter/scripts/public_collector_identity.json model/scripts/
+          python -m pip freeze > adapter-dependencies.txt
+      - name: Prepare public state branch
+        id: state
+        working-directory: state
+        run: |
+          if git ls-remote --exit-code --heads origin public_state; then
+            git fetch --depth=1 origin public_state
+            git checkout -B public_state FETCH_HEAD
+          else
+            RESULT=$?
+            if [ "$RESULT" -ne 2 ]; then exit "$RESULT"; fi
+            git checkout --orphan public_state
+            git rm -rf .
+          fi
+      - name: Collect and validate complete public packet
+        id: collect
+        run: |
+          AS_OF=$(TZ=Asia/Shanghai date +%F)
+          REQUIRED_CUTOFF=$(python -c 'import datetime; from zoneinfo import ZoneInfo; d=datetime.datetime.now(ZoneInfo("Asia/Shanghai")).date()-datetime.timedelta(days=1); d-=datetime.timedelta(days=max(0,d.weekday()-4)); print(d)')
+          FULL_FLAG=""
+          if [ "$(TZ=Asia/Shanghai date +%d)" -le 7 ]; then FULL_FLAG="--full"; fi
+          python model/scripts/collect_public_snapshot.py \
+            --state-dir state/public_state \
+            --as-of "$AS_OF" --required-cutoff "$REQUIRED_CUTOFF" \
+            --run-id "public_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}" $FULL_FLAG
+      - name: Publish attempt and preserve last success
+        if: always() && steps.state.outcome == 'success'
+        working-directory: state
+        run: |
+          if [ -f public_state/latest_attempt.json ]; then
+            git add -- public_state
+            if ! git diff --cached --quiet; then
+              git -c user.name=public-collector -c user.email=public-collector commit -m "Record public snapshot attempt"
+              git push origin HEAD:refs/heads/public_state
+            fi
+          fi
+      - name: Retain diagnostic artifact independently of branch publication
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-snapshot-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            state/public_state/latest_attempt.json
+            state/public_state/latest_success.json
+            state/public_state/attempts/public_${{ github.run_id }}_${{ github.run_attempt }}.json
+            state/public_state/runs/public_${{ github.run_id }}_${{ github.run_attempt }}/
+            adapter-dependencies.txt
+          if-no-files-found: warn
+          retention-days: 90

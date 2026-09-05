@@ -1,0 +1,33 @@
+{
+  "model_commit": "6ad8c97af188604cd83f0c5daada15eeda9e6aa7",
+  "git_blob_hashes": {
+    "models/etf_shadow_v063/README.md": "a59eb95fe93205ef76fec6bfb7d9727b794607b3",
+    "models/etf_shadow_v063/build_production_panel.py": "35ee8906c9b3e3dd77f43f0af3cb33ad72937eea",
+    "models/etf_shadow_v063/etf_shadow_v063/__init__.py": "0b2059f458b67342f2962bc7a51086e7d57eb2de",
+    "models/etf_shadow_v063/etf_shadow_v063/backtest.py": "6e6fb1c10fb62e073a1c80b23067e23c734f9b18",
+    "models/etf_shadow_v063/etf_shadow_v063/challengers.py": "92ea11e7e823e50bd3bca33d48c02acf9a30d786",
+    "models/etf_shadow_v063/etf_shadow_v063/core.py": "7f6958d9a120af771613e99f65ddbc9daa5f21c2",
+    "models/etf_shadow_v063/etf_shadow_v063/data_pipeline.py": "7f9faeabd51431fd9e26f1a54ff0b71526f4aa34",
+    "models/etf_shadow_v063/etf_shadow_v063/runner.py": "f253cdb264d7dff6267b5b72f3ed46f4bc4ce240",
+    "models/etf_shadow_v063/etf_shadow_v063/validation.py": "014ef354ddfa80f9074a81e6a0d658519f1ace29",
+    "models/etf_shadow_v063/requirements-research-extras.txt": "c8e84941ef72cdb7134438669973ee0a60607a29",
+    "models/etf_shadow_v063/requirements.txt": "bd730ce971e147b3cc21ede1b7c5af972830e2ba",
+    "models/etf_shadow_v063/run_shadow_v0_6_3.py": "68a026c666530a865548854003d94e37b4231661",
+    "models/etf_shadow_v063/tests/test_data_pipeline.py": "60826379fa12e283337bf06697196de42fa55ebe",
+    "models/etf_shadow_v063/tests/test_engine.py": "44c6a1b34c48caada97c0104533a90e4fd081d91",
+    "models/etf_shadow_v063_data2/PRE_REGISTRATION.md": "f6cbb60f97e78af732ab2f4409f925174165d770",
+    "models/etf_shadow_v063_data2/README.md": "4f76c484d9528186adde9b1165e9ad1a26d6756e",
+    "models/etf_shadow_v063_data2/build_local_proxy.py": "6e452b5df87c861b00e59538846d357b7b7d7288",
+    "models/etf_shadow_v063_data2/etf_shadow_v063_data2/__init__.py": "3716804ec615d8e30e50852fb73f294d1bbf4d24",
+    "models/etf_shadow_v063_data2/etf_shadow_v063_data2/data_contract.py": "dffb0487f6287c3431b469d7efaf39a8c6d5abaf",
+    "models/etf_shadow_v063_data2/etf_shadow_v063_data2/external_validation.py": "8ace137be3bee67b1bd567d986a48167453a09e9",
+    "models/etf_shadow_v063_data2/etf_shadow_v063_data2/runner.py": "c93670e39c5e7b97d904588d2f54f046e17a592a",
+    "models/etf_shadow_v063_data2/requirements-promotion.txt": "876ccd9804f0e69390284268ce34336e802bc46b",
+    "models/etf_shadow_v063_data2/run_shadow_v0_6_3_data2.py": "7ef000105fd1ef82340b875e95f02c8ad5e1e539",
+    "models/etf_shadow_v063_data2/tests/test_data_contract.py": "66cca50f5335e831739cfb3ae72d5c35fe21ac72",
+    "models/etf_shadow_v063_data2/tests/test_local_proxy_builder.py": "f5f0b99536428f4ec0f61392cfbcf7f941a97d0d",
+    "models/etf_shadow_v063_data2/tests/test_runner_data2.py": "465e284a8ad43b88113149a0c33e5d35f3c33c05",
+    "requirements.txt": "19a86b38ea673d2ad60ca67731d9428709448352",
+    "scripts/privacy_guard.py": "41b485ded232071f2f844aa8c5e935c05395c8cd"
+  }
+}
