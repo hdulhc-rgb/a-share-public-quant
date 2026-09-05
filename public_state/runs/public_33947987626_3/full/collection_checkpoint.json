@@ -1,0 +1,163 @@
+{
+  "as_of": "2026-09-05",
+  "collector_version": "0.6.3-data.2",
+  "completed_sources": {
+    "raw/A_SHARE_510300_eastmoney_qfq.csv": {
+      "completed_at_utc": "2026-09-05T05:18:46.548757+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2372,
+      "sha256": "cfb666cf4ad2ce7b8a464d1d8e61a9ddb211007fd26707f7692ca125883bcd9e",
+      "source_label": "Eastmoney:510300:qfq"
+    },
+    "raw/A_SHARE_510300_eastmoney_unadjusted.csv": {
+      "completed_at_utc": "2026-09-05T05:18:48.016416+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2372,
+      "sha256": "55e0b441be9062b27b31af5aba9c68f0d91a5d26b67b538049aa195aea40e2b8",
+      "source_label": "Eastmoney:510300:unadjusted"
+    },
+    "raw/A_SHARE_510300_tencent_qfq.csv": {
+      "completed_at_utc": "2026-09-05T05:18:52.445838+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2372,
+      "sha256": "475dca675c68ab7a92d0fb80845f7604377d8d84cd9608c601d168b8a92f56a7",
+      "source_label": "Tencent:510300:qfq"
+    },
+    "raw/CASH_511880_eastmoney_qfq.csv": {
+      "completed_at_utc": "2026-09-05T05:52:55.481273+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2372,
+      "sha256": "49af1e21816ed8025ce86e450f692ef7007b96ee92a53d7e41d08b034a7ac19f",
+      "source_label": "Eastmoney:511880:qfq"
+    },
+    "raw/CASH_511880_eastmoney_unadjusted.csv": {
+      "completed_at_utc": "2026-09-05T05:52:56.790448+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2372,
+      "sha256": "a395a446349e952ed1d3cdd76a293e5acc7a639886cd510e92d5ed298ce3136d",
+      "source_label": "Eastmoney:511880:unadjusted"
+    },
+    "raw/CASH_511880_tencent_qfq.csv": {
+      "completed_at_utc": "2026-09-05T05:45:34.200672+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2372,
+      "sha256": "e1ec9cf2d8670b3482fbc6d234cb20ff98216172d9d8a3c4389ee6baea85b7a4",
+      "source_label": "Tencent:511880:qfq"
+    },
+    "raw/GOLD_159937_eastmoney_qfq.csv": {
+      "completed_at_utc": "2026-09-05T05:52:49.681230+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2372,
+      "sha256": "6cebcfe46331fc2f061c97ad551fdf036f42e8795a19e91712b49b24f42403f5",
+      "source_label": "Eastmoney:159937:qfq"
+    },
+    "raw/GOLD_159937_eastmoney_unadjusted.csv": {
+      "completed_at_utc": "2026-09-05T05:52:52.596015+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2372,
+      "sha256": "6cebcfe46331fc2f061c97ad551fdf036f42e8795a19e91712b49b24f42403f5",
+      "source_label": "Eastmoney:159937:unadjusted"
+    },
+    "raw/GOLD_159937_tencent_qfq.csv": {
+      "completed_at_utc": "2026-09-05T05:45:29.196761+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2372,
+      "sha256": "008083a2ba4799afb6e023ef5c2177157cfb62709c93e9ea484d8775ded91a6e",
+      "source_label": "Tencent:159937:qfq"
+    },
+    "raw/US_NASDAQ100_513100_eastmoney_qfq.csv": {
+      "completed_at_utc": "2026-09-05T05:45:10.694597+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2371,
+      "sha256": "0ff574889dc81db924960ddd429c725335ba16ecffcc46f84310c8a7c324852d",
+      "source_label": "Eastmoney:513100:qfq"
+    },
+    "raw/US_NASDAQ100_513100_eastmoney_unadjusted.csv": {
+      "completed_at_utc": "2026-09-05T05:45:14.338637+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2371,
+      "sha256": "2def333f18f7712cba22c40b0dd80167e02877361abd0360db3883ad9c16a168",
+      "source_label": "Eastmoney:513100:unadjusted"
+    },
+    "raw/US_NASDAQ100_513100_tencent_qfq.csv": {
+      "completed_at_utc": "2026-09-05T05:45:19.100650+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2371,
+      "sha256": "d6d0db6268d9cfeeabcd892c05df87503cb4cb895c2ea1156e1141f1800f7d3f",
+      "source_label": "Tencent:513100:qfq"
+    },
+    "raw/US_SP500_513500_eastmoney_qfq.csv": {
+      "completed_at_utc": "2026-09-05T05:44:58.093152+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2371,
+      "sha256": "33c87f16c8379e590721bdf87b33368be879f2a3f3e339ab89babfcc376f7df2",
+      "source_label": "Eastmoney:513500:qfq"
+    },
+    "raw/US_SP500_513500_eastmoney_unadjusted.csv": {
+      "completed_at_utc": "2026-09-05T05:44:59.554516+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2371,
+      "sha256": "7967d3c009bf7c8e4a1ca218f51de806004ae04597313436887231cd589582a8",
+      "source_label": "Eastmoney:513500:unadjusted"
+    },
+    "raw/US_SP500_513500_tencent_qfq.csv": {
+      "completed_at_utc": "2026-09-05T05:45:04.400603+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-04",
+      "rows": 2371,
+      "sha256": "bf71982b86bed70b15d6f3d7e1a70b25d25414ebf62885d599027ad0f9dd6ac1",
+      "source_label": "Tencent:513500:qfq"
+    }
+  },
+  "created_at_utc": "2026-09-05T05:52:46.340192+00:00",
+  "requested_start": "2016-12-01",
+  "schema_version": "1.0",
+  "status": "SOURCES_COMPLETE",
+  "universe": [
+    {
+      "asset": "A_SHARE",
+      "market_symbol": "sh510300",
+      "name": "沪深300ETF华泰柏瑞",
+      "security": "510300"
+    },
+    {
+      "asset": "US_SP500",
+      "market_symbol": "sh513500",
+      "name": "标普500ETF博时",
+      "security": "513500"
+    },
+    {
+      "asset": "US_NASDAQ100",
+      "market_symbol": "sh513100",
+      "name": "纳指ETF国泰",
+      "security": "513100"
+    },
+    {
+      "asset": "GOLD",
+      "market_symbol": "sz159937",
+      "name": "黄金ETF博时",
+      "security": "159937"
+    },
+    {
+      "asset": "CASH",
+      "market_symbol": "sh511880",
+      "name": "银华日利ETF",
+      "security": "511880"
+    }
+  ],
+  "updated_at_utc": "2026-09-05T05:52:56.988684+00:00"
+}
