@@ -74,3 +74,42 @@ historical backtests for forward returns. An empty ledger stays NOT_EVALUABLE.
 
 The production strategy, candidate universe, execution permissions, historical
 validation policy and private forward accounting are outside this public adapter.
+
+## Adapter 1.1: source-level recovery audit
+
+The first deployed adapter had a concrete recovery defect: the original packet
+had three complete source files, but a new run looked only for a complete success
+pointer and restarted from zero. Its first primary failure also prevented all
+independent secondary sources from being fetched. These defects were in the
+adapter, not proof of an origin-wide provider outage.
+
+Adapter 1.1 imports verified partial source files from failed DATA_MISSING runs
+only when model commit, as-of, required complete cutoff, exact source label,
+checkpoint identity and SHA256 agree. Original acquisition time must be within
+24 hours. Imports copy original bytes into a new run directory and record origin
+run/hash/time; old receipts and packets stay immutable. A new date is not eligible
+for this partial recovery. Hash or identity conflict fails closed before fetching.
+A complete dual-source packet still passes the original pinned model validator.
+
+Each source has its own outcome. A failed primary provider no longer prevents
+secondary collection. A host circuit opens after the bounded attempts fail,
+preventing repeated same-host attempts across assets within that run. Request
+traces record symbol/adjustment/date context and request fingerprints. Requests
+are paced at least one second apart per host, with retry-after honored within the
+budget. There is no unbounded retry and no extra recurring schedule.
+
+On a retryable transport error, the second attempt can use standard system curl
+against the exact same HTTPS URL, headers and existing proxy policy; the third
+returns to urllib. This stays inside three total attempts, not three attempts per
+client. A 403/404 does not trigger another client. The adapter does not switch
+hosts, disable TLS checks, impersonate browser TLS, add proxies, remove environment
+proxies or follow redirects. Client compatibility is a hypothesis to test in the
+hosted run; neither changing clients nor passing synthetic tests establishes that
+live data is restored. No public report suggesting third-party proxy use is an
+approved data-source or network route.
+
+Acceptance tests cover 14/15 partial recovery fetching only the one missing
+source, independent secondary completion on primary outage, old-run byte
+immutability, cache tamper rejection, date-boundary rejection, host-circuit
+isolation and same-request client compatibility. A source outage still produces
+FAILED_CLOSED with explicit recovered/new/missing counts, never a model target.

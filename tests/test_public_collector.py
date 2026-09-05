@@ -140,8 +140,98 @@ class CollectorTests(unittest.TestCase):
         self.assertEqual(r["status"], "FAILED_CLOSED")
         self.assertEqual(self.calls, [])
 
+    def make_partial(self):
+        original = self.primary
+        self.secondary = lambda p, s, e: original(p, s, e, "qfq")
+        def flaky(p, s, e, a):
+            if p.asset == "US_SP500" and a == "qfq":
+                raise c.dp.DataGateClosed("DATA_MISSING:temporary")
+            return original(p, s, e, a)
+        self.primary = flaky
+        r = self.run_collection()
+        self.assertEqual(r["status"], "FAILED_CLOSED", r)
+        self.assertEqual(r["completed_source_count"], 14)
+        self.primary = original
+        return r
+
+    def test_recovery_fetches_only_one_missing_source_without_mutating_old_run(self):
+        first = self.make_partial()
+        previous = {str(p): p.read_bytes() for p in (self.state / "runs/run1").rglob("*") if p.is_file()}
+        self.calls = []
+        r = self.run_collection(run_id="run2")
+        self.assertEqual(r["status"], "SUCCESS", r)
+        self.assertEqual(r["recovered_source_count"], 14)
+        self.assertEqual(len(self.calls), 1)
+        self.assertEqual(previous, {p: Path(p).read_bytes() for p in previous})
+
+    def test_independent_provider_completes_when_primary_unavailable(self):
+        original = self.primary
+        self.secondary = lambda p, s, e: original(p, s, e, "qfq")
+        self.primary = lambda *args: (_ for _ in ()).throw(c.dp.DataGateClosed("DATA_MISSING:primary"))
+        r = self.run_collection()
+        self.assertEqual(r["status"], "FAILED_CLOSED")
+        self.assertEqual(r["completed_source_count"], 5)
+        self.assertTrue(all(x["source"].endswith("tencent_qfq.csv") for x in r["source_outcomes"] if x["status"] == "FETCHED"))
+
+    def test_tampered_partial_packet_is_not_silently_refetched(self):
+        self.make_partial()
+        raw = self.state / "runs/run1/full/raw/A_SHARE_510300_eastmoney_qfq.csv"
+        raw.write_text("tampered")
+        self.calls = []
+        r = self.run_collection(run_id="run2")
+        self.assertEqual(r["status"], "FAILED_CLOSED")
+        self.assertIn("HASH_MISMATCH", r["failure"])
+        self.assertEqual(self.calls, [])
+
+    def test_partial_packet_cannot_cross_as_of_boundary(self):
+        self.make_partial()
+        self.calls = []
+        r = self.run_collection(425, "new_date")
+        self.assertEqual(r["status"], "SUCCESS", r)
+        self.assertEqual(r["recovered_source_count"], 0)
+        self.assertEqual(len(self.calls), 15)
+
 
 class TransportTests(unittest.TestCase):
+    def test_retry_after_beyond_budget_does_not_retry_early(self):
+        def opener(*a, **kw):
+            raise urllib.error.HTTPError("https://example.invalid", 429, "limited", {"Retry-After": "600"}, None)
+        t = c.Transport(opener=opener, sleeper=lambda _: None)
+        with self.assertRaisesRegex(c.dp.DataGateClosed, "RETRY_AFTER_EXCEEDS_BUDGET"):
+            t.request("https://example.invalid", {})
+        self.assertEqual(len(t.events), 1)
+
+    def test_second_standard_client_can_recover_same_request(self):
+        def failing(*a, **kw):
+            raise urllib.error.URLError("connection closed")
+        calls = []
+        def curl(url, headers, timeout):
+            calls.append(url)
+            return '{"data": {}}'
+        t = c.Transport(opener=failing, sleeper=lambda _: None, curl_runner=curl)
+        t.request("https://example.invalid", {"secid": "1.510300"})
+        self.assertEqual([x["client"] for x in t.events], ["urllib", "curl"])
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(t.events[0]["request_id"], t.events[1]["request_id"])
+
+    def test_open_circuit_suppresses_same_host_but_allows_independent_host(self):
+        def opener(req, **kw):
+            if req.host == "bad.invalid":
+                raise urllib.error.URLError("down")
+            return io.BytesIO(b"ok")
+        t = c.Transport(opener=opener, sleeper=lambda _: None)
+        with self.assertRaises(c.dp.DataGateClosed):t.request("https://bad.invalid", {})
+        with self.assertRaises(c.dp.DataGateClosed):t.request("https://bad.invalid", {"next": "source"})
+        self.assertEqual(len(t.events), 3)
+        self.assertEqual(t.request("https://good.invalid", {}), "ok")
+
+    def test_forbidden_does_not_trigger_second_client(self):
+        def opener(*a, **kw):
+            raise urllib.error.HTTPError("https://example.invalid", 403, "forbidden", {}, None)
+        def curl(*args):raise AssertionError("must not call a second client on 403")
+        t = c.Transport(opener=opener, curl_runner=curl, sleeper=lambda _: None)
+        with self.assertRaises(c.dp.DataGateClosed):t.request("https://example.invalid", {})
+        self.assertEqual(len(t.events), 1)
     def test_502_has_two_retries_even_legacy_requests_five(self):
         def failing(*a, **kw):
             raise urllib.error.HTTPError("https://example.invalid", 502, "bad", {}, None)
