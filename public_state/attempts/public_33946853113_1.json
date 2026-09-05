@@ -1,0 +1,71 @@
+{
+  "adapter_version": "public-collector-1.0",
+  "as_of": "2026-09-05",
+  "broker_connection": false,
+  "elapsed_ms": 12535,
+  "failed_stage": "DATA_COLLECTION",
+  "failure": "DataGateClosed:DATA_MISSING:push2his.eastmoney.com:RemoteDisconnected",
+  "failure_classification": "DATA_MISSING",
+  "finished_at": "2026-09-05T05:18:57.260753+00:00",
+  "model_commit": "6ad8c97af188604cd83f0c5daada15eeda9e6aa7",
+  "orders_generated": false,
+  "required_cutoff": "2026-09-04",
+  "retry_ceiling": 2,
+  "run_id": "public_33946853113_1",
+  "run_path": "FULL_REBUILD",
+  "schema": "PUBLIC_SNAPSHOT_ATTEMPT_V1",
+  "source_requests": [
+    {
+      "attempt": 1,
+      "host": "push2his.eastmoney.com",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "host": "push2his.eastmoney.com",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "host": "proxy.finance.qq.com",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "host": "proxy.finance.qq.com",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "host": "proxy.finance.qq.com",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "host": "proxy.finance.qq.com",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "host": "proxy.finance.qq.com",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "host": "push2his.eastmoney.com",
+      "state": "RemoteDisconnected"
+    },
+    {
+      "attempt": 2,
+      "host": "push2his.eastmoney.com",
+      "state": "RemoteDisconnected"
+    },
+    {
+      "attempt": 3,
+      "host": "push2his.eastmoney.com",
+      "state": "RemoteDisconnected"
+    }
+  ],
+  "started_at": "2026-09-05T05:18:44.726225+00:00",
+  "status": "FAILED_CLOSED"
+}
