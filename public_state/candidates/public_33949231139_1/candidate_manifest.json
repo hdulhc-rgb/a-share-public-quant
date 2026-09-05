@@ -1,0 +1,229 @@
+{
+  "as_of": "2026-09-05",
+  "candidates": [
+    {
+      "aligned_nav": null,
+      "aligned_nav_date": null,
+      "avg_amount_20d": 282807240.75865,
+      "closing_discount_premium": null,
+      "code": "159201",
+      "core_universe_changed": false,
+      "data_cutoff": "2026-09-04",
+      "dual_source_diagnostics": {
+        "cumulative_log_return_gap": 0.0,
+        "low_volatility_exception": false,
+        "max_abs_return_diff": 0.0,
+        "median_abs_return_diff": 0.0,
+        "overlap_rows": 372,
+        "p99_abs_return_diff": 0.0,
+        "primary_daily_std": 0.011314151124553884,
+        "return_correlation": 1.0,
+        "secondary_daily_std": 0.011314151124553884,
+        "secondary_total_return_gate_passed": true
+      },
+      "execution_permission": false,
+      "history_rows": 373,
+      "missing": [
+        "LIVE_EXECUTION_PREMIUM",
+        "CURRENT_FEES_TRACKING_AND_SUBSCRIPTION_REVIEW",
+        "STRATEGIC_LEG_PREREGISTRATION"
+      ],
+      "nav_state": "NOT_EVALUABLE",
+      "premium_semantics": "END_OF_DAY_SAME_DATE_ONLY; NOT_EXECUTABLE_INTRADAY_PREMIUM",
+      "source_requests": [
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "1",
+            "secid": "0.159201"
+          },
+          "request_id": "c1d3014ea9dbcd21",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "0",
+            "secid": "0.159201"
+          },
+          "request_id": "a40eb40479922b9c",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "proxy.finance.qq.com",
+          "params": {
+            "param": "sz159201,day,2025-02-27,2026-09-04,640,qfq"
+          },
+          "request_id": "63867b6561194792",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "api.fund.eastmoney.com",
+          "params": {},
+          "request_id": "ed03ec695207df7a",
+          "state": "OK"
+        }
+      ],
+      "status": "WATCHLIST",
+      "unadjusted_close": 1.187
+    },
+    {
+      "code": "159232",
+      "core_universe_changed": false,
+      "execution_permission": false,
+      "failure": "DataGateClosed:DATA_MISSING:push2his.eastmoney.com:RemoteDisconnected",
+      "source_requests": [
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "1",
+            "secid": "0.159232"
+          },
+          "request_id": "e6e5c60ab84cdab1",
+          "state": "RemoteDisconnected"
+        },
+        {
+          "attempt": 2,
+          "client": "curl",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "1",
+            "secid": "0.159232"
+          },
+          "request_id": "e6e5c60ab84cdab1",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "0",
+            "secid": "0.159232"
+          },
+          "request_id": "e0d606ce46f8d362",
+          "state": "RemoteDisconnected"
+        },
+        {
+          "attempt": 2,
+          "client": "curl",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "0",
+            "secid": "0.159232"
+          },
+          "request_id": "e0d606ce46f8d362",
+          "state": "URLError"
+        },
+        {
+          "attempt": 3,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "0",
+            "secid": "0.159232"
+          },
+          "request_id": "e0d606ce46f8d362",
+          "state": "RemoteDisconnected"
+        }
+      ],
+      "status": "NOT_EVALUABLE"
+    },
+    {
+      "code": "513030",
+      "core_universe_changed": false,
+      "execution_permission": false,
+      "failure": "DataGateClosed:DATA_MISSING:push2his.eastmoney.com:RemoteDisconnected",
+      "source_requests": [
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "1",
+            "secid": "1.513030"
+          },
+          "request_id": "db50f55848f4df76",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "0",
+            "secid": "1.513030"
+          },
+          "request_id": "4efb293a064d686f",
+          "state": "RemoteDisconnected"
+        },
+        {
+          "attempt": 2,
+          "client": "curl",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "0",
+            "secid": "1.513030"
+          },
+          "request_id": "4efb293a064d686f",
+          "state": "URLError"
+        },
+        {
+          "attempt": 3,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20260904",
+            "fqt": "0",
+            "secid": "1.513030"
+          },
+          "request_id": "4efb293a064d686f",
+          "state": "RemoteDisconnected"
+        }
+      ],
+      "status": "NOT_EVALUABLE"
+    }
+  ],
+  "elapsed_ms": 16622,
+  "file_hashes": {
+    "159201_nav.json": "f47eb255b83770bbacbeb87199309aa9921fc7db5865d354b022ee047d8e589e",
+    "159201_qfq.csv": "b9be298d421feb17d1608c0e47c28a79c2bc8a8ba2730fca8056a220194c74fa",
+    "159201_secondary.csv": "8e9be59767ddb578a05cee63a159141110ec6f78ea763fd113c9a041a989cb3c",
+    "159201_unadjusted.csv": "b9be298d421feb17d1608c0e47c28a79c2bc8a8ba2730fca8056a220194c74fa"
+  },
+  "generated_at": "2026-09-05T06:14:17.403084+00:00",
+  "layer": "INDEPENDENT_CANDIDATES",
+  "orders_generated": false,
+  "required_cutoff": "2026-09-04"
+}
