@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,7 +10,8 @@ import pandas as pd
 
 from etf_shadow_v063.backtest import differential_check
 from etf_shadow_v063.challengers import inverse_volatility
-from etf_shadow_v063.core import ResearchClosed, cap_turnover, next_tradable_time, normalize_long_only, validate_returns
+from etf_shadow_v063.core import ResearchClosed, ResearchPolicy, cap_turnover, next_tradable_time, normalize_long_only, validate_returns
+from etf_shadow_v063.runner import run_research
 from etf_shadow_v063.validation import anchored_walk_forward, combinatorial_purged_cv
 
 
@@ -64,6 +66,78 @@ class CoreInvariantTests(unittest.TestCase):
         self.assertTrue(cpcv)
         for split in cpcv:
             self.assertFalse(set(split.train).intersection(split.test))
+
+    def test_live_current_cannot_change_historical_validation(self) -> None:
+        benchmark = pd.Series([0.25, 0.35, 0.10, 0.15, 0.15], index=[
+            "A_SHARE", "US_SP500", "US_NASDAQ100", "GOLD", "CASH",
+        ])
+        live_a = pd.Series([0.25, 0.35, 0.10, 0.15, 0.15], index=benchmark.index)
+        live_b = pd.Series([0.15, 0.55, 0.10, 0.10, 0.10], index=benchmark.index)
+        index = pd.bdate_range("2022-01-03", periods=400)
+        rng = np.random.default_rng(20260727)
+        market = rng.normal(0.0002, 0.008, len(index))
+        returns = pd.DataFrame({
+            "A_SHARE": 0.7 * market + rng.normal(0, 0.006, len(index)),
+            "US_SP500": 0.9 * market + rng.normal(0, 0.004, len(index)),
+            "US_NASDAQ100": 1.2 * market + rng.normal(0, 0.006, len(index)),
+            "GOLD": -0.1 * market + rng.normal(0, 0.004, len(index)),
+            "CASH": np.full(len(index), 0.00005),
+        }, index=index)
+        historical_artifacts = [
+            "walk_forward_results.csv",
+            "challenge_matrix.csv",
+            "stability_regions.csv",
+            "constraint_diagnostics.csv",
+            "cpcv_results.csv",
+            "candidate_filter_trace.jsonl",
+            "shadow_replay.csv",
+            "shadow_replay.jsonl",
+            "performance_attribution.csv",
+            "differential_backtest.json",
+        ]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            run_a = run_research(
+                returns=returns,
+                benchmark=benchmark,
+                historical_anchor=benchmark,
+                live_current=live_a,
+                as_of=index[-1],
+                output_root=root / "a",
+                source_path=None,
+                source_id="SYNTHETIC_POINT_IN_TIME_TEST",
+                policy=ResearchPolicy(),
+            )
+            run_b = run_research(
+                returns=returns,
+                benchmark=benchmark,
+                historical_anchor=benchmark,
+                live_current=live_b,
+                as_of=index[-1],
+                output_root=root / "b",
+                source_path=None,
+                source_id="SYNTHETIC_POINT_IN_TIME_TEST",
+                policy=ResearchPolicy(),
+            )
+            for filename in historical_artifacts:
+                self.assertEqual(
+                    (run_a / filename).read_bytes(),
+                    (run_b / filename).read_bytes(),
+                    filename,
+                )
+            snapshot_a = json.loads(
+                (run_a / "decision_snapshot.json").read_text(encoding="utf-8")
+            )
+            snapshot_b = json.loads(
+                (run_b / "decision_snapshot.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(snapshot_a["historical_validation"], snapshot_b["historical_validation"])
+            self.assertNotEqual(
+                snapshot_a["challenger_actual_shadow_targets"],
+                snapshot_b["challenger_actual_shadow_targets"],
+            )
+            self.assertFalse(snapshot_a["historical_validation"]["uses_live_current"])
+            self.assertEqual(snapshot_a["signal_date"], index[-1].isoformat())
 
 
 if __name__ == "__main__":

@@ -169,9 +169,15 @@ def next_tradable_time(calendar: pd.DatetimeIndex, signal_time: pd.Timestamp) ->
     return result
 
 
-def data_fingerprint(returns: pd.DataFrame, source_path: Path | None, as_of: pd.Timestamp, source_id: str) -> dict[str, object]:
+def data_fingerprint(
+    returns: pd.DataFrame,
+    source_path: Path | None,
+    as_of: pd.Timestamp,
+    source_id: str,
+    source_attestation: Mapping[str, object] | None = None,
+) -> dict[str, object]:
     csv_bytes = returns.to_csv(index=True, float_format="%.12g").encode("utf-8")
-    return {
+    fingerprint = {
         "source_id": source_id,
         "source_path": str(source_path.resolve()) if source_path else "SYNTHETIC_FIXTURE",
         "source_file_sha256": sha256_file(source_path) if source_path else None,
@@ -181,9 +187,27 @@ def data_fingerprint(returns: pd.DataFrame, source_path: Path | None, as_of: pd.
         "max_date": returns.index.max().isoformat(),
         "rows": int(len(returns)),
         "columns": list(map(str, returns.columns)),
-        "adjustment": "TOTAL_RETURN_REQUIRED_FOR_PRODUCTION; SYNTHETIC_IN_DEMO",
-        "point_in_time": True,
+        "adjustment": (
+            source_attestation.get("adjustment")
+            if source_attestation
+            else "SYNTHETIC_IN_DEMO"
+        ),
+        "return_kind": (
+            source_attestation.get("return_kind")
+            if source_attestation
+            else "SYNTHETIC_FIXTURE"
+        ),
+        "source_snapshot_frozen": bool(source_attestation),
+        "production_return_panel_gate_passed": bool(
+            source_attestation
+            and source_attestation.get("production_return_panel_gate_passed") is True
+        ),
     }
+    if source_attestation:
+        fingerprint["source_manifest_path"] = source_attestation.get("source_manifest_path")
+        fingerprint["source_manifest_sha256"] = source_attestation.get("source_manifest_sha256")
+        fingerprint["source_providers"] = source_attestation.get("providers")
+    return fingerprint
 
 
 def create_run_directory(root: Path, run_id: str) -> Path:
@@ -200,4 +224,3 @@ def write_json(path: Path, value: object) -> None:
 
 def policy_dict(policy: ResearchPolicy) -> dict[str, object]:
     return asdict(policy)
-
