@@ -27,9 +27,9 @@ jobs:
           python-version: '3.12'
       - run: |
           python -m pip install -r adapter/scripts/public-collector-requirements.txt
-          cp adapter/scripts/collect_public_snapshot.py adapter/scripts/public_collector_identity.json adapter/scripts/cn_sessions.py adapter/scripts/forward_ledger.py model/scripts/
+          cp adapter/scripts/collect_public_snapshot.py adapter/scripts/public_collector_identity.json adapter/scripts/cn_sessions.py adapter/scripts/forward_ledger.py adapter/scripts/collect_candidates.py model/scripts/
           mkdir -p model/tests
-          cp adapter/tests/test_public_collector.py adapter/tests/test_forward_ledger.py model/tests/
+          cp adapter/tests/test_public_collector.py adapter/tests/test_forward_ledger.py adapter/tests/test_candidates.py model/tests/
           python adapter/scripts/privacy_guard.py
           python -m unittest discover -s model/tests -v
           PYTHONPATH=model/models/etf_shadow_v063 python -m unittest discover -s model/models/etf_shadow_v063/tests -v

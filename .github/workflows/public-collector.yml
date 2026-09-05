@@ -9,6 +9,7 @@ on:
       - 'scripts/public_collector_identity.json'
       - 'scripts/public-collector-requirements.txt'
       - 'scripts/cn_sessions.py'
+      - 'scripts/collect_candidates.py'
   schedule:
     - cron: '0 2 * * 6' # Saturday 10:00 Asia/Shanghai, ahead of the 10:30 consumer
   workflow_dispatch:
@@ -46,7 +47,7 @@ jobs:
       - name: Prepare immutable model and adapter
         run: |
           python -m pip install -r adapter/scripts/public-collector-requirements.txt
-          cp adapter/scripts/collect_public_snapshot.py adapter/scripts/public_collector_identity.json adapter/scripts/cn_sessions.py model/scripts/
+          cp adapter/scripts/collect_public_snapshot.py adapter/scripts/public_collector_identity.json adapter/scripts/cn_sessions.py adapter/scripts/collect_candidates.py model/scripts/
           python -m pip freeze > adapter-dependencies.txt
       - name: Prepare public state branch
         id: state
@@ -72,6 +73,10 @@ jobs:
             --state-dir state/public_state \
             --as-of "$AS_OF" --required-cutoff "$REQUIRED_CUTOFF" \
             --run-id "public_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}" $FULL_FLAG
+      - name: Collect independent public candidate diagnostics
+        if: steps.collect.outcome == 'success'
+        run: |
+          python model/scripts/collect_candidates.py --as-of "$(TZ=Asia/Shanghai date +%F)" --output-dir "state/public_state/candidates/public_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}"
       - name: Publish attempt and preserve last success
         if: always() && steps.state.outcome == 'success'
         working-directory: state
@@ -93,6 +98,7 @@ jobs:
             state/public_state/latest_success.json
             state/public_state/attempts/public_${{ github.run_id }}_${{ github.run_attempt }}.json
             state/public_state/runs/public_${{ github.run_id }}_${{ github.run_attempt }}/
+            state/public_state/candidates/public_${{ github.run_id }}_${{ github.run_attempt }}/
             adapter-dependencies.txt
           if-no-files-found: warn
           retention-days: 90
