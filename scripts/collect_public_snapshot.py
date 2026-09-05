@@ -311,6 +311,7 @@ def build_collected_packet(packet, primary, secondary, receipt, kwargs):
 
 def collect(state, as_of, required_cutoff, run_id, primary=dp.fetch_eastmoney,
             secondary=dp.fetch_tencent, force_full=False, transport=None):
+    state = Path(state).resolve()
     if not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", run_id):
         raise ValueError("invalid run id")
     attempt_file = state / "attempts" / (run_id + ".json")
@@ -381,7 +382,8 @@ def collect(state, as_of, required_cutoff, run_id, primary=dp.fetch_eastmoney,
     except Exception as error:
         # All terminal paths persist a receipt, including JSON/schema/runtime errors.
         reason = (type(error).__name__ + ":" + str(error))[:600]
-        terminal_checkpoint(packet, reason)
+        if packet.is_relative_to(state / 'runs' / run_id):
+            terminal_checkpoint(packet, reason)
         classification = ("PARSE_FAILED" if isinstance(error, (json.JSONDecodeError, pd.errors.ParserError))
                           else "SOURCE_CONFLICT" if "RETURN_PANEL_GATE_FAILED" in reason
                           else "STALE" if "CUTOFF" in reason or "STALE" in reason
