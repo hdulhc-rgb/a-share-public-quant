@@ -1,8 +1,9 @@
 # a-share-public-quant
 
-公开、可复核、默认失败关闭的量化研究仓库。当前包含两条彼此隔离的影子研究线：
+公开、可复核、默认失败关闭的量化研究仓库。当前包含三条彼此隔离的影子研究线：
 
 - `models/etf_shadow_v063`：跨资产 ETF 固定挑战者矩阵、walk-forward / CPCV、双回测一致性、约束诊断和完整证据链。
+- `models/etf_shadow_v063_data2`：v0.6.3 的追加式数据层挑战者；把经济总收益与可交易收益分开，增加本地真实篮子、QDII 分解和晋级依赖门禁，不改写冻结的 v0.6.3。
 - `models/meituan_options_v12`：从单一股票售卖模型抽离的公开安全期权证据层，只验证报价与反事实，不触发 Covered Call 或交易。
 
 ## 安全边界
@@ -23,6 +24,7 @@
 python -m pip install -r requirements.txt
 python scripts/privacy_guard.py
 (cd models/etf_shadow_v063 && python -m unittest discover -s tests -v)
+(cd models/etf_shadow_v063_data2 && PYTHONPATH=../etf_shadow_v063:. python -m unittest discover -s tests -v)
 (cd models/meituan_options_v12 && python -m unittest discover -s tests -v)
 ```
 
@@ -30,6 +32,7 @@ python scripts/privacy_guard.py
 
 ```bash
 (cd models/etf_shadow_v063 && python run_shadow_v0_6_3.py --demo --output-root demo_runs)
+(cd models/etf_shadow_v063_data2 && python run_shadow_v0_6_3_data2.py --demo --output-root demo_runs)
 (cd models/meituan_options_v12 && python run_meituan_options_v12.py --demo --output-dir demo_run)
 ```
 
