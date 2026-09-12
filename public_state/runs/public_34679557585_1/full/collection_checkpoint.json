@@ -1,0 +1,100 @@
+{
+  "as_of": "2026-09-12",
+  "collector_version": "0.6.3-data.2",
+  "completed_sources": {
+    "raw/A_SHARE_510300_eastmoney_qfq.csv": {
+      "completed_at_utc": "2026-09-12T07:00:20.067295+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-11",
+      "rows": 2377,
+      "sha256": "e470af48ca7e8949d5f7b865db1f65fec60d0a408215bc210a19746913b7b796",
+      "source_label": "Eastmoney:510300:qfq"
+    },
+    "raw/A_SHARE_510300_eastmoney_unadjusted.csv": {
+      "completed_at_utc": "2026-09-12T07:00:21.858485+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-11",
+      "rows": 2377,
+      "sha256": "aa8647aea5ada88fce12be87ec0a9e7ce4cffdc636f1ed395da90ce56f8cfdfa",
+      "source_label": "Eastmoney:510300:unadjusted"
+    },
+    "raw/A_SHARE_510300_tencent_qfq.csv": {
+      "completed_at_utc": "2026-09-12T07:00:27.191433+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-11",
+      "rows": 2377,
+      "sha256": "c58ea192b94a0d8432a95ef77726769325c1969019c3ec4fb412e50743a1bceb",
+      "source_label": "Tencent:510300:qfq"
+    },
+    "raw/CASH_511880_tencent_qfq.csv": {
+      "completed_at_utc": "2026-09-12T07:00:53.373140+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-11",
+      "rows": 2377,
+      "sha256": "fc599a8e4743e27a6f64891b850709651272fde46b6682948115d55d528f811a",
+      "source_label": "Tencent:511880:qfq"
+    },
+    "raw/GOLD_159937_tencent_qfq.csv": {
+      "completed_at_utc": "2026-09-12T07:00:48.368734+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-11",
+      "rows": 2377,
+      "sha256": "989ebd735be8bcd54eeb2bb4fb6cc71185e2980c2a8d2ab32973d1fcfc298164",
+      "source_label": "Tencent:159937:qfq"
+    },
+    "raw/US_NASDAQ100_513100_tencent_qfq.csv": {
+      "completed_at_utc": "2026-09-12T07:00:43.361548+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-11",
+      "rows": 2376,
+      "sha256": "f14c78c4d2da66717f758cf68b758812969f5067ac45d35cf4dd8801bf50940d",
+      "source_label": "Tencent:513100:qfq"
+    },
+    "raw/US_SP500_513500_tencent_qfq.csv": {
+      "completed_at_utc": "2026-09-12T07:00:38.374126+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-09-11",
+      "rows": 2376,
+      "sha256": "2a034b14012fa3836d989e98c82761b82878e352d4c928b630d54759c815da80",
+      "source_label": "Tencent:513500:qfq"
+    }
+  },
+  "created_at_utc": "2026-09-12T07:00:18.237615+00:00",
+  "failure": "DataGateClosed:DATA_MISSING:INCOMPLETE_SOURCE_PACKET:8",
+  "requested_start": "2016-12-01",
+  "schema_version": "1.0",
+  "status": "FAILED_CLOSED",
+  "universe": [
+    {
+      "asset": "A_SHARE",
+      "market_symbol": "sh510300",
+      "name": "沪深300ETF华泰柏瑞",
+      "security": "510300"
+    },
+    {
+      "asset": "US_SP500",
+      "market_symbol": "sh513500",
+      "name": "标普500ETF博时",
+      "security": "513500"
+    },
+    {
+      "asset": "US_NASDAQ100",
+      "market_symbol": "sh513100",
+      "name": "纳指ETF国泰",
+      "security": "513100"
+    },
+    {
+      "asset": "GOLD",
+      "market_symbol": "sz159937",
+      "name": "黄金ETF博时",
+      "security": "159937"
+    },
+    {
+      "asset": "CASH",
+      "market_symbol": "sh511880",
+      "name": "银华日利ETF",
+      "security": "511880"
+    }
+  ],
+  "updated_at_utc": "2026-09-12T07:00:53.373746+00:00"
+}
