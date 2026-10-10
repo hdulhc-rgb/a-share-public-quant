@@ -1,0 +1,116 @@
+{
+  "as_of": "2026-10-10",
+  "collector_version": "0.6.3-data.2",
+  "completed_sources": {
+    "raw/A_SHARE_510300_eastmoney_qfq.csv": {
+      "completed_at_utc": "2026-10-10T08:15:18.961348+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-10-09",
+      "rows": 2391,
+      "sha256": "563447fab5977e2f0ae5ab6cf72c3485dcd5dd012883eef50961d1fc74040b01",
+      "source_label": "Eastmoney:510300:qfq"
+    },
+    "raw/A_SHARE_510300_eastmoney_unadjusted.csv": {
+      "completed_at_utc": "2026-10-10T08:15:20.875372+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-10-09",
+      "rows": 2391,
+      "sha256": "93b594595753c7344f123e453c465f1010e5875f6557a571068cd548e857b11a",
+      "source_label": "Eastmoney:510300:unadjusted"
+    },
+    "raw/A_SHARE_510300_tencent_qfq.csv": {
+      "completed_at_utc": "2026-10-10T08:15:27.009283+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-10-09",
+      "rows": 2391,
+      "sha256": "6d16e883f5a0b3d037d4696b78d36b8ae1016f9b89ec137432b33813b44e030c",
+      "source_label": "Tencent:510300:qfq"
+    },
+    "raw/CASH_511880_tencent_qfq.csv": {
+      "completed_at_utc": "2026-10-10T08:16:00.213487+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-10-09",
+      "rows": 2391,
+      "sha256": "4d5bbfb7d10bc656fe9df8a47a78038e213ae1aa9e500227ea6941cf919caf40",
+      "source_label": "Tencent:511880:qfq"
+    },
+    "raw/GOLD_159937_tencent_qfq.csv": {
+      "completed_at_utc": "2026-10-10T08:15:54.902204+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-10-09",
+      "rows": 2391,
+      "sha256": "e56bcce94073a746cbf1c6342e6cd660df40730746e2317de3fe9e70d3184326",
+      "source_label": "Tencent:159937:qfq"
+    },
+    "raw/US_NASDAQ100_513100_tencent_qfq.csv": {
+      "completed_at_utc": "2026-10-10T08:15:49.585347+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-10-09",
+      "rows": 2390,
+      "sha256": "9d5254e9e0c6a8efffe25e0dbd7555165282652e981f884fae7a5d12757f01d5",
+      "source_label": "Tencent:513100:qfq"
+    },
+    "raw/US_SP500_513500_eastmoney_qfq.csv": {
+      "completed_at_utc": "2026-10-10T08:15:28.762647+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-10-09",
+      "rows": 2390,
+      "sha256": "1fd4fd148f8c5277c2ee23f855f656c3171f49eb5749234435834132158d641f",
+      "source_label": "Eastmoney:513500:qfq"
+    },
+    "raw/US_SP500_513500_eastmoney_unadjusted.csv": {
+      "completed_at_utc": "2026-10-10T08:15:32.832908+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-10-09",
+      "rows": 2390,
+      "sha256": "16656905ffbb7f1132e5bed9456a9e8719100cd8d16b22228f65a27b15ae1a47",
+      "source_label": "Eastmoney:513500:unadjusted"
+    },
+    "raw/US_SP500_513500_tencent_qfq.csv": {
+      "completed_at_utc": "2026-10-10T08:15:38.142335+00:00",
+      "first_date": "2016-12-01",
+      "last_date": "2026-10-09",
+      "rows": 2390,
+      "sha256": "b9988e0fe716d42e266ca76986d911cd97f178bd2796bd98aa30b244491d9320",
+      "source_label": "Tencent:513500:qfq"
+    }
+  },
+  "created_at_utc": "2026-10-10T08:15:17.075817+00:00",
+  "failure": "DataGateClosed:DATA_MISSING:INCOMPLETE_SOURCE_PACKET:6",
+  "requested_start": "2016-12-01",
+  "schema_version": "1.0",
+  "status": "FAILED_CLOSED",
+  "universe": [
+    {
+      "asset": "A_SHARE",
+      "market_symbol": "sh510300",
+      "name": "沪深300ETF华泰柏瑞",
+      "security": "510300"
+    },
+    {
+      "asset": "US_SP500",
+      "market_symbol": "sh513500",
+      "name": "标普500ETF博时",
+      "security": "513500"
+    },
+    {
+      "asset": "US_NASDAQ100",
+      "market_symbol": "sh513100",
+      "name": "纳指ETF国泰",
+      "security": "513100"
+    },
+    {
+      "asset": "GOLD",
+      "market_symbol": "sz159937",
+      "name": "黄金ETF博时",
+      "security": "159937"
+    },
+    {
+      "asset": "CASH",
+      "market_symbol": "sh511880",
+      "name": "银华日利ETF",
+      "security": "511880"
+    }
+  ],
+  "updated_at_utc": "2026-10-10T08:16:00.214602+00:00"
+}
