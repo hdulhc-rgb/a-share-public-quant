@@ -1,28 +1,44 @@
 {
   "adapter_sha256": "18e2c06941530764b99d83368fc9f457b5dac6b9b02fadd6815a3bfb0a54d1ba",
   "adapter_version": "public-collector-1.1",
-  "as_of": "2026-10-10",
+  "as_of": "2026-10-17",
   "broker_connection": false,
-  "completed_source_count": 9,
-  "elapsed_ms": 44801,
+  "completed_source_count": 5,
+  "elapsed_ms": 37010,
   "failed_stage": "DATA_COLLECTION",
-  "failure": "DataGateClosed:DATA_MISSING:INCOMPLETE_SOURCE_PACKET:6",
+  "failure": "DataGateClosed:DATA_MISSING:INCOMPLETE_SOURCE_PACKET:10",
   "failure_classification": "DATA_MISSING",
-  "finished_at": "2026-10-10T08:16:00.215033+00:00",
+  "finished_at": "2026-10-17T06:45:33.576295+00:00",
   "full_rebuild_reason": "HISTORICAL_REVISION_REQUIRES_FULL_REBUILD",
   "model_commit": "6ad8c97af188604cd83f0c5daada15eeda9e6aa7",
   "orders_generated": false,
-  "packet": "runs/public_38037211499_1/full",
+  "packet": "runs/public_39011031160_1/full",
   "recovered_source_count": 0,
   "recovered_sources": [],
-  "required_cutoff": "2026-10-09",
+  "required_cutoff": "2026-10-16",
   "retry_ceiling": 2,
-  "run_id": "public_38037211499_1",
+  "run_id": "public_39011031160_1",
   "run_path": "FULL_REBUILD",
   "schema": "PUBLIC_SNAPSHOT_ATTEMPT_V1",
   "source_failures": [
     {
       "error": "DATA_MISSING:push2his.eastmoney.com:RemoteDisconnected",
+      "source": "raw/A_SHARE_510300_eastmoney_qfq.csv"
+    },
+    {
+      "error": "DATA_MISSING:CIRCUIT_OPEN:push2his.eastmoney.com",
+      "source": "raw/A_SHARE_510300_eastmoney_unadjusted.csv"
+    },
+    {
+      "error": "DATA_MISSING:CIRCUIT_OPEN:push2his.eastmoney.com",
+      "source": "raw/US_SP500_513500_eastmoney_qfq.csv"
+    },
+    {
+      "error": "DATA_MISSING:CIRCUIT_OPEN:push2his.eastmoney.com",
+      "source": "raw/US_SP500_513500_eastmoney_unadjusted.csv"
+    },
+    {
+      "error": "DATA_MISSING:CIRCUIT_OPEN:push2his.eastmoney.com",
       "source": "raw/US_NASDAQ100_513100_eastmoney_qfq.csv"
     },
     {
@@ -49,11 +65,11 @@
   "source_outcomes": [
     {
       "source": "raw/A_SHARE_510300_eastmoney_qfq.csv",
-      "status": "FETCHED"
+      "status": "MISSING"
     },
     {
       "source": "raw/A_SHARE_510300_eastmoney_unadjusted.csv",
-      "status": "FETCHED"
+      "status": "MISSING"
     },
     {
       "source": "raw/A_SHARE_510300_tencent_qfq.csv",
@@ -61,11 +77,11 @@
     },
     {
       "source": "raw/US_SP500_513500_eastmoney_qfq.csv",
-      "status": "FETCHED"
+      "status": "MISSING"
     },
     {
       "source": "raw/US_SP500_513500_eastmoney_unadjusted.csv",
-      "status": "FETCHED"
+      "status": "MISSING"
     },
     {
       "source": "raw/US_SP500_513500_tencent_qfq.csv",
@@ -115,11 +131,11 @@
       "host": "push2his.eastmoney.com",
       "params": {
         "beg": "20260807",
-        "end": "20261009",
+        "end": "20261016",
         "fqt": "1",
         "secid": "1.510300"
       },
-      "request_id": "22855b15f39ad263",
+      "request_id": "cd07aa33835760af",
       "state": "OK"
     },
     {
@@ -128,25 +144,38 @@
       "host": "push2his.eastmoney.com",
       "params": {
         "beg": "20161201",
-        "end": "20261009",
+        "end": "20261016",
         "fqt": "1",
         "secid": "1.510300"
       },
-      "request_id": "080db32199d9d7f1",
-      "state": "OK"
+      "request_id": "a81f92336404d0fb",
+      "state": "RemoteDisconnected"
     },
     {
-      "attempt": 1,
+      "attempt": 2,
+      "client": "curl",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261016",
+        "fqt": "1",
+        "secid": "1.510300"
+      },
+      "request_id": "a81f92336404d0fb",
+      "state": "URLError"
+    },
+    {
+      "attempt": 3,
       "client": "urllib",
       "host": "push2his.eastmoney.com",
       "params": {
         "beg": "20161201",
-        "end": "20261009",
-        "fqt": "0",
+        "end": "20261016",
+        "fqt": "1",
         "secid": "1.510300"
       },
-      "request_id": "f9a5c0c3b96139cd",
-      "state": "OK"
+      "request_id": "a81f92336404d0fb",
+      "state": "RemoteDisconnected"
     },
     {
       "attempt": 1,
@@ -193,48 +222,9 @@
       "client": "urllib",
       "host": "proxy.finance.qq.com",
       "params": {
-        "param": "sh510300,day,2024-12-01,2026-10-09,640,qfq"
+        "param": "sh510300,day,2024-12-01,2026-10-16,640,qfq"
       },
-      "request_id": "5fce1d7aaa0d5eeb",
-      "state": "OK"
-    },
-    {
-      "attempt": 1,
-      "client": "urllib",
-      "host": "push2his.eastmoney.com",
-      "params": {
-        "beg": "20161201",
-        "end": "20261009",
-        "fqt": "1",
-        "secid": "1.513500"
-      },
-      "request_id": "75bf7dfefda44c71",
-      "state": "OK"
-    },
-    {
-      "attempt": 1,
-      "client": "urllib",
-      "host": "push2his.eastmoney.com",
-      "params": {
-        "beg": "20161201",
-        "end": "20261009",
-        "fqt": "0",
-        "secid": "1.513500"
-      },
-      "request_id": "6f22f3d28b7b0778",
-      "state": "RemoteDisconnected"
-    },
-    {
-      "attempt": 2,
-      "client": "curl",
-      "host": "push2his.eastmoney.com",
-      "params": {
-        "beg": "20161201",
-        "end": "20261009",
-        "fqt": "0",
-        "secid": "1.513500"
-      },
-      "request_id": "6f22f3d28b7b0778",
+      "request_id": "bde5c263e897e1c4",
       "state": "OK"
     },
     {
@@ -282,49 +272,10 @@
       "client": "urllib",
       "host": "proxy.finance.qq.com",
       "params": {
-        "param": "sh513500,day,2024-12-01,2026-10-09,640,qfq"
+        "param": "sh513500,day,2024-12-01,2026-10-16,640,qfq"
       },
-      "request_id": "10da496e5e0b66a5",
+      "request_id": "6290211a2f3eb6be",
       "state": "OK"
-    },
-    {
-      "attempt": 1,
-      "client": "urllib",
-      "host": "push2his.eastmoney.com",
-      "params": {
-        "beg": "20161201",
-        "end": "20261009",
-        "fqt": "1",
-        "secid": "1.513100"
-      },
-      "request_id": "88804260444521af",
-      "state": "RemoteDisconnected"
-    },
-    {
-      "attempt": 2,
-      "client": "curl",
-      "host": "push2his.eastmoney.com",
-      "params": {
-        "beg": "20161201",
-        "end": "20261009",
-        "fqt": "1",
-        "secid": "1.513100"
-      },
-      "request_id": "88804260444521af",
-      "state": "URLError"
-    },
-    {
-      "attempt": 3,
-      "client": "urllib",
-      "host": "push2his.eastmoney.com",
-      "params": {
-        "beg": "20161201",
-        "end": "20261009",
-        "fqt": "1",
-        "secid": "1.513100"
-      },
-      "request_id": "88804260444521af",
-      "state": "RemoteDisconnected"
     },
     {
       "attempt": 1,
@@ -371,9 +322,9 @@
       "client": "urllib",
       "host": "proxy.finance.qq.com",
       "params": {
-        "param": "sh513100,day,2024-12-01,2026-10-09,640,qfq"
+        "param": "sh513100,day,2024-12-01,2026-10-16,640,qfq"
       },
-      "request_id": "5b1504749eb6dc3d",
+      "request_id": "dc26bf1f20c73133",
       "state": "OK"
     },
     {
@@ -421,9 +372,9 @@
       "client": "urllib",
       "host": "proxy.finance.qq.com",
       "params": {
-        "param": "sz159937,day,2024-12-01,2026-10-09,640,qfq"
+        "param": "sz159937,day,2024-12-01,2026-10-16,640,qfq"
       },
-      "request_id": "7fba8a3ee33085a7",
+      "request_id": "4a88f7a5ff216236",
       "state": "OK"
     },
     {
@@ -471,12 +422,12 @@
       "client": "urllib",
       "host": "proxy.finance.qq.com",
       "params": {
-        "param": "sh511880,day,2024-12-01,2026-10-09,640,qfq"
+        "param": "sh511880,day,2024-12-01,2026-10-16,640,qfq"
       },
-      "request_id": "fb7223fef418eb39",
+      "request_id": "495f1aeb9d361f1c",
       "state": "OK"
     }
   ],
-  "started_at": "2026-10-10T08:15:15.413962+00:00",
+  "started_at": "2026-10-17T06:44:56.566562+00:00",
   "status": "FAILED_CLOSED"
 }
