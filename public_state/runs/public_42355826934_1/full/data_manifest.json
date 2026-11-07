@@ -1,0 +1,117 @@
+{
+  "as_of": "2026-11-07",
+  "broker_connection": false,
+  "collection_checkpoint": {
+    "path": "collection_checkpoint.json",
+    "sha256": "5e84928c67cd9e0ff193cfa4e351c6d6717a897d7345cd1e620dc80c0519fd23",
+    "status": "SOURCES_COMPLETE"
+  },
+  "collector_version": "0.6.3-data.2",
+  "demo": false,
+  "gates": {
+    "asset_integrity_and_freshness_passed": true,
+    "common_return_panel_passed": true,
+    "dual_source_adjusted_return_verification_passed": true,
+    "production_return_panel_passed": true
+  },
+  "generated_at_utc": "2026-11-07T08:32:36.622929+00:00",
+  "orders_generated": false,
+  "quality": {
+    "path": "data_quality.csv",
+    "sha256": "eda4921e9abfe9092d95d62f27bc26f4da5ecb8f6483fb7514ea3a7eef146da6"
+  },
+  "raw_file_hashes": {
+    "raw/A_SHARE_510300_eastmoney_qfq.csv": "1eee7319a72c57e4bc78656aeefd3a052734700fef526a145f68c5026204320d",
+    "raw/A_SHARE_510300_eastmoney_unadjusted.csv": "456d407d3aaac0f1e41ab01b44180ff55dbb6b9ddaaf79173dceff71b1e00dc9",
+    "raw/A_SHARE_510300_tencent_qfq.csv": "3377b362933c725a1f267a86a2929bbc1e55ff592b1f6071e511398e7be94d8e",
+    "raw/CASH_511880_eastmoney_qfq.csv": "9b04f50d9993d2acccdfa773927dcb642ffd030acb5d66d3d8876f6e619d4c80",
+    "raw/CASH_511880_eastmoney_unadjusted.csv": "1afdee69811568c783f9f3adc6fb5c1dc04dfa6f3c30a33c7a5425f1182279cf",
+    "raw/CASH_511880_tencent_qfq.csv": "42b93303e65434b59eccd096c29e7dcdc4805319fdb011943adbb88a5aa486e3",
+    "raw/GOLD_159937_eastmoney_qfq.csv": "d31b0916fcaa6cb6a72889d9da443a53ff12ec058e0e4828f7ca7240ccf503db",
+    "raw/GOLD_159937_eastmoney_unadjusted.csv": "d31b0916fcaa6cb6a72889d9da443a53ff12ec058e0e4828f7ca7240ccf503db",
+    "raw/GOLD_159937_tencent_qfq.csv": "b9b912eb5e0d97a6274a03f620aec1eb75619ceb8d6c7f5e55410d786075f6b8",
+    "raw/US_NASDAQ100_513100_eastmoney_qfq.csv": "e1a64fa7820262f8a5734736a92831d112e0c571610c035b806d1d88552a7be8",
+    "raw/US_NASDAQ100_513100_eastmoney_unadjusted.csv": "d6976e488d3a51243525d0ddf203b5ef329f117fd52595ced1f31a7ac54aa1fa",
+    "raw/US_NASDAQ100_513100_tencent_qfq.csv": "d42ec95d4780e9fcae8631d004f3b5b9c2642b86d8ffcc977269093bf7ebe651",
+    "raw/US_SP500_513500_eastmoney_qfq.csv": "5c249290ee3b523f49f137f235a5c1e1481835aca961427e544497532f3e0966",
+    "raw/US_SP500_513500_eastmoney_unadjusted.csv": "9e08f0b8d45a6a6f6b71fe52691e9def989fe6123e9a678e8a02a79f97306f46",
+    "raw/US_SP500_513500_tencent_qfq.csv": "21cc9a3b3556c2910aa1abad64bca503a414e8207e21ba48f2d307d75c7ace5d"
+  },
+  "requested_start": "2016-12-01",
+  "research_lock": true,
+  "return_panel": {
+    "adjustment": "qfq",
+    "columns": [
+      "A_SHARE",
+      "US_SP500",
+      "US_NASDAQ100",
+      "GOLD",
+      "CASH"
+    ],
+    "max_date": "2026-11-06",
+    "min_date": "2016-12-02",
+    "path": "returns.csv",
+    "return_kind": "distribution_adjusted_market_return_proxy",
+    "rows": 2408,
+    "sha256": "7f05fd174c648494ed22481ad7d36f19d35ff3761be4527ba5177fa1c54c792f",
+    "source_snapshot_frozen": true,
+    "staleness_calendar_days": 1
+  },
+  "schema_version": "1.0",
+  "sources": {
+    "adjustment_semantics_documentation": "https://akshare.akfamily.xyz/data/fund/fund_public.html",
+    "primary": {
+      "adjustment": "qfq",
+      "endpoint": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "provider": "Eastmoney"
+    },
+    "secondary": {
+      "adjustment": "qfq",
+      "endpoint": "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get",
+      "provider": "Tencent"
+    }
+  },
+  "universe": [
+    {
+      "asset": "A_SHARE",
+      "market_symbol": "sh510300",
+      "name": "沪深300ETF华泰柏瑞",
+      "security": "510300"
+    },
+    {
+      "asset": "US_SP500",
+      "market_symbol": "sh513500",
+      "name": "标普500ETF博时",
+      "security": "513500"
+    },
+    {
+      "asset": "US_NASDAQ100",
+      "market_symbol": "sh513100",
+      "name": "纳指ETF国泰",
+      "security": "513100"
+    },
+    {
+      "asset": "GOLD",
+      "market_symbol": "sz159937",
+      "name": "黄金ETF博时",
+      "security": "159937"
+    },
+    {
+      "asset": "CASH",
+      "market_symbol": "sh511880",
+      "name": "银华日利ETF",
+      "security": "511880"
+    }
+  ],
+  "verification_policy": {
+    "cumulative_log_return_gap_max": 0.03,
+    "low_volatility_daily_std_max": 0.00075,
+    "low_volatility_p99_diff_max": 0.0015,
+    "max_abs_return_diff_max": 0.03,
+    "maximum_staleness_calendar_days": 7,
+    "median_abs_return_diff_max": 0.0005,
+    "minimum_secondary_overlap": 252,
+    "p99_abs_return_diff_max": 0.005,
+    "return_correlation_min": 0.98
+  }
+}

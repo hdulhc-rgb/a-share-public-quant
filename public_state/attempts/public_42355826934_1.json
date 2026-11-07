@@ -1,0 +1,469 @@
+{
+  "adapter_sha256": "18e2c06941530764b99d83368fc9f457b5dac6b9b02fadd6815a3bfb0a54d1ba",
+  "adapter_version": "public-collector-1.1",
+  "as_of": "2026-11-07",
+  "broker_connection": false,
+  "completed_source_count": 15,
+  "data_cutoff": "2026-11-06",
+  "elapsed_ms": 55782,
+  "failure": null,
+  "finished_at": "2026-11-07T08:32:36.810167+00:00",
+  "manifest_sha256": "a4dc01564a49ebff2f1dd85c66cb4cbf90c7793bbdae2fd9d9d7ca1cb98bfa2b",
+  "model_commit": "6ad8c97af188604cd83f0c5daada15eeda9e6aa7",
+  "orders_generated": false,
+  "packet": "runs/public_42355826934_1/full",
+  "recovered_source_count": 0,
+  "recovered_sources": [],
+  "required_cutoff": "2026-11-06",
+  "retry_ceiling": 2,
+  "run_id": "public_42355826934_1",
+  "run_path": "FULL_REBUILD",
+  "schema": "PUBLIC_SNAPSHOT_ATTEMPT_V1",
+  "source_failures": [],
+  "source_outcomes": [
+    {
+      "source": "raw/A_SHARE_510300_eastmoney_qfq.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/A_SHARE_510300_eastmoney_unadjusted.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/A_SHARE_510300_tencent_qfq.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/US_SP500_513500_eastmoney_qfq.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/US_SP500_513500_eastmoney_unadjusted.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/US_SP500_513500_tencent_qfq.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/US_NASDAQ100_513100_eastmoney_qfq.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/US_NASDAQ100_513100_eastmoney_unadjusted.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/US_NASDAQ100_513100_tencent_qfq.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/GOLD_159937_eastmoney_qfq.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/GOLD_159937_eastmoney_unadjusted.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/GOLD_159937_tencent_qfq.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/CASH_511880_eastmoney_qfq.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/CASH_511880_eastmoney_unadjusted.csv",
+      "status": "FETCHED"
+    },
+    {
+      "source": "raw/CASH_511880_tencent_qfq.csv",
+      "status": "FETCHED"
+    }
+  ],
+  "source_requests": [
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261106",
+        "fqt": "1",
+        "secid": "1.510300"
+      },
+      "request_id": "d8d695733858ee79",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261106",
+        "fqt": "0",
+        "secid": "1.510300"
+      },
+      "request_id": "4e0af314e8274ec7",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh510300,day,2016-12-01,2018-11-30,640,qfq"
+      },
+      "request_id": "844c02d42c1b18d3",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh510300,day,2018-12-01,2020-11-30,640,qfq"
+      },
+      "request_id": "069970e10e08cf32",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh510300,day,2020-12-01,2022-11-30,640,qfq"
+      },
+      "request_id": "d8c37536318eab16",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh510300,day,2022-12-01,2024-11-30,640,qfq"
+      },
+      "request_id": "e1c6aeb788ce8cdb",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh510300,day,2024-12-01,2026-11-06,640,qfq"
+      },
+      "request_id": "1e407b0e0d00706c",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261106",
+        "fqt": "1",
+        "secid": "1.513500"
+      },
+      "request_id": "18e11c5ccc92a716",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261106",
+        "fqt": "0",
+        "secid": "1.513500"
+      },
+      "request_id": "b77f0c1647927d3a",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh513500,day,2016-12-01,2018-11-30,640,qfq"
+      },
+      "request_id": "f44567b01595c8cd",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh513500,day,2018-12-01,2020-11-30,640,qfq"
+      },
+      "request_id": "6604ba38d5aaafa8",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh513500,day,2020-12-01,2022-11-30,640,qfq"
+      },
+      "request_id": "71ed5783d0a6d1b9",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh513500,day,2022-12-01,2024-11-30,640,qfq"
+      },
+      "request_id": "10f1651c017d8afa",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh513500,day,2024-12-01,2026-11-06,640,qfq"
+      },
+      "request_id": "08fea6c6c1239916",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261106",
+        "fqt": "1",
+        "secid": "1.513100"
+      },
+      "request_id": "0f48f8ba6e1299fc",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261106",
+        "fqt": "0",
+        "secid": "1.513100"
+      },
+      "request_id": "7c3664b1dd0f2732",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh513100,day,2016-12-01,2018-11-30,640,qfq"
+      },
+      "request_id": "3465f8293a9d9e90",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh513100,day,2018-12-01,2020-11-30,640,qfq"
+      },
+      "request_id": "7b407c1fa0ebbfaa",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh513100,day,2020-12-01,2022-11-30,640,qfq"
+      },
+      "request_id": "062f68536bc6b1d7",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh513100,day,2022-12-01,2024-11-30,640,qfq"
+      },
+      "request_id": "9dd61edad538ed0e",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh513100,day,2024-12-01,2026-11-06,640,qfq"
+      },
+      "request_id": "0e075bc5b7765fdc",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261106",
+        "fqt": "1",
+        "secid": "0.159937"
+      },
+      "request_id": "edfb9bfcb589be3c",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261106",
+        "fqt": "0",
+        "secid": "0.159937"
+      },
+      "request_id": "888ea6f77ebc7c4e",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sz159937,day,2016-12-01,2018-11-30,640,qfq"
+      },
+      "request_id": "9010c24c92ea579e",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sz159937,day,2018-12-01,2020-11-30,640,qfq"
+      },
+      "request_id": "9ea3d30ddb07086a",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sz159937,day,2020-12-01,2022-11-30,640,qfq"
+      },
+      "request_id": "4c1ec55830a84b9a",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sz159937,day,2022-12-01,2024-11-30,640,qfq"
+      },
+      "request_id": "4d804764ebe9ec43",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sz159937,day,2024-12-01,2026-11-06,640,qfq"
+      },
+      "request_id": "d9847203578d2c1f",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261106",
+        "fqt": "1",
+        "secid": "1.511880"
+      },
+      "request_id": "bea91a4c18a5fcb6",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "push2his.eastmoney.com",
+      "params": {
+        "beg": "20161201",
+        "end": "20261106",
+        "fqt": "0",
+        "secid": "1.511880"
+      },
+      "request_id": "21b95c39b7ad6f19",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh511880,day,2016-12-01,2018-11-30,640,qfq"
+      },
+      "request_id": "26755cafbb607c01",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh511880,day,2018-12-01,2020-11-30,640,qfq"
+      },
+      "request_id": "e74a0aabb87047ff",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh511880,day,2020-12-01,2022-11-30,640,qfq"
+      },
+      "request_id": "be1102218636047f",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh511880,day,2022-12-01,2024-11-30,640,qfq"
+      },
+      "request_id": "7bce463d7e61c7c1",
+      "state": "OK"
+    },
+    {
+      "attempt": 1,
+      "client": "urllib",
+      "host": "proxy.finance.qq.com",
+      "params": {
+        "param": "sh511880,day,2024-12-01,2026-11-06,640,qfq"
+      },
+      "request_id": "5e3ad5809224918f",
+      "state": "OK"
+    }
+  ],
+  "started_at": "2026-11-07T08:31:41.028232+00:00",
+  "status": "SUCCESS"
+}

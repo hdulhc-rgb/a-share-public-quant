@@ -1,0 +1,318 @@
+{
+  "as_of": "2026-11-07",
+  "candidates": [
+    {
+      "aligned_nav": null,
+      "aligned_nav_date": null,
+      "avg_amount_20d": 290115698.88710004,
+      "closing_discount_premium": null,
+      "code": "159201",
+      "core_universe_changed": false,
+      "data_cutoff": "2026-11-06",
+      "dual_source_diagnostics": {
+        "cumulative_log_return_gap": 0.0,
+        "low_volatility_exception": false,
+        "max_abs_return_diff": 0.0,
+        "median_abs_return_diff": 0.0,
+        "overlap_rows": 411,
+        "p99_abs_return_diff": 0.0,
+        "primary_daily_std": 0.011059037586248936,
+        "return_correlation": 1.0,
+        "secondary_daily_std": 0.011059037586248936,
+        "secondary_total_return_gate_passed": true
+      },
+      "execution_permission": false,
+      "history_rows": 412,
+      "missing": [
+        "LIVE_EXECUTION_PREMIUM",
+        "CURRENT_FEES_TRACKING_AND_SUBSCRIPTION_REVIEW",
+        "STRATEGIC_LEG_PREREGISTRATION"
+      ],
+      "nav_state": "NOT_EVALUABLE",
+      "premium_semantics": "END_OF_DAY_SAME_DATE_ONLY; NOT_EXECUTABLE_INTRADAY_PREMIUM",
+      "source_requests": [
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20261106",
+            "fqt": "1",
+            "secid": "0.159201"
+          },
+          "request_id": "c92b672bfa7dbee8",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20261106",
+            "fqt": "0",
+            "secid": "0.159201"
+          },
+          "request_id": "878385bf105dde5c",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "proxy.finance.qq.com",
+          "params": {
+            "param": "sz159201,day,2025-02-27,2026-11-06,640,qfq"
+          },
+          "request_id": "b82c2ca7d8d12452",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "api.fund.eastmoney.com",
+          "params": {},
+          "request_id": "ed03ec695207df7a",
+          "state": "OK"
+        }
+      ],
+      "status": "WATCHLIST",
+      "unadjusted_close": 1.157
+    },
+    {
+      "aligned_nav": null,
+      "aligned_nav_date": null,
+      "avg_amount_20d": 188333845.75579998,
+      "closing_discount_premium": null,
+      "code": "159232",
+      "core_universe_changed": false,
+      "data_cutoff": "2026-11-06",
+      "dual_source_diagnostics": {
+        "cumulative_log_return_gap": 0.0,
+        "low_volatility_exception": false,
+        "max_abs_return_diff": 0.0,
+        "median_abs_return_diff": 0.0,
+        "overlap_rows": 368,
+        "p99_abs_return_diff": 0.0,
+        "primary_daily_std": 0.010169711234826911,
+        "return_correlation": 1.0,
+        "secondary_daily_std": 0.010169711234826911,
+        "secondary_total_return_gate_passed": true
+      },
+      "execution_permission": false,
+      "history_rows": 369,
+      "missing": [
+        "LIVE_EXECUTION_PREMIUM",
+        "CURRENT_FEES_TRACKING_AND_SUBSCRIPTION_REVIEW",
+        "STRATEGIC_LEG_PREREGISTRATION"
+      ],
+      "nav_state": "NOT_EVALUABLE",
+      "premium_semantics": "END_OF_DAY_SAME_DATE_ONLY; NOT_EXECUTABLE_INTRADAY_PREMIUM",
+      "source_requests": [
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20261106",
+            "fqt": "1",
+            "secid": "0.159232"
+          },
+          "request_id": "47a0d207c9d69268",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20261106",
+            "fqt": "0",
+            "secid": "0.159232"
+          },
+          "request_id": "8f0e7ae782c9c2e0",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "proxy.finance.qq.com",
+          "params": {
+            "param": "sz159232,day,2025-04-30,2026-11-06,640,qfq"
+          },
+          "request_id": "2d7cc131d3b61f62",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "api.fund.eastmoney.com",
+          "params": {},
+          "request_id": "66b81ff6634a9459",
+          "state": "OK"
+        }
+      ],
+      "status": "WATCHLIST",
+      "unadjusted_close": 1.135
+    },
+    {
+      "aligned_nav": null,
+      "aligned_nav_date": null,
+      "avg_amount_20d": 79791820.75,
+      "closing_discount_premium": null,
+      "code": "513030",
+      "core_universe_changed": false,
+      "data_cutoff": "2026-11-06",
+      "dual_source_diagnostics": {
+        "cumulative_log_return_gap": 0.0,
+        "low_volatility_exception": false,
+        "max_abs_return_diff": 0.0008992805755394517,
+        "median_abs_return_diff": 0.0,
+        "overlap_rows": 2953,
+        "p99_abs_return_diff": 0.0,
+        "primary_daily_std": 0.012518755491249246,
+        "return_correlation": 0.9999982923990055,
+        "secondary_daily_std": 0.012518642914292662,
+        "secondary_total_return_gate_passed": true
+      },
+      "execution_permission": false,
+      "history_rows": 2954,
+      "missing": [
+        "LIVE_EXECUTION_PREMIUM",
+        "CURRENT_FEES_TRACKING_AND_SUBSCRIPTION_REVIEW",
+        "DAX_ECONOMIC_FX_WRAPPER_DECOMPOSITION"
+      ],
+      "nav_state": "NOT_EVALUABLE",
+      "premium_semantics": "END_OF_DAY_SAME_DATE_ONLY; NOT_EXECUTABLE_INTRADAY_PREMIUM",
+      "source_requests": [
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20261106",
+            "fqt": "1",
+            "secid": "1.513030"
+          },
+          "request_id": "9b3081976da66639",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "push2his.eastmoney.com",
+          "params": {
+            "beg": "20140101",
+            "end": "20261106",
+            "fqt": "0",
+            "secid": "1.513030"
+          },
+          "request_id": "7eddf2817206a7eb",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "proxy.finance.qq.com",
+          "params": {
+            "param": "sh513030,day,2014-09-05,2016-09-04,640,qfq"
+          },
+          "request_id": "0c5a8200441e7ee6",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "proxy.finance.qq.com",
+          "params": {
+            "param": "sh513030,day,2016-09-05,2018-09-04,640,qfq"
+          },
+          "request_id": "3b84ea72495df5f4",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "proxy.finance.qq.com",
+          "params": {
+            "param": "sh513030,day,2018-09-05,2020-09-04,640,qfq"
+          },
+          "request_id": "3e56513c5b24365e",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "proxy.finance.qq.com",
+          "params": {
+            "param": "sh513030,day,2020-09-05,2022-09-04,640,qfq"
+          },
+          "request_id": "68883588fb53450a",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "proxy.finance.qq.com",
+          "params": {
+            "param": "sh513030,day,2022-09-05,2024-09-04,640,qfq"
+          },
+          "request_id": "cf8350648dc865ed",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "proxy.finance.qq.com",
+          "params": {
+            "param": "sh513030,day,2024-09-05,2026-09-04,640,qfq"
+          },
+          "request_id": "1503b78997be104e",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "proxy.finance.qq.com",
+          "params": {
+            "param": "sh513030,day,2026-09-05,2026-11-06,640,qfq"
+          },
+          "request_id": "5141104dcd220718",
+          "state": "OK"
+        },
+        {
+          "attempt": 1,
+          "client": "urllib",
+          "host": "api.fund.eastmoney.com",
+          "params": {},
+          "request_id": "e0fc9b05c5e3597b",
+          "state": "OK"
+        }
+      ],
+      "status": "WATCHLIST",
+      "unadjusted_close": 1.807
+    }
+  ],
+  "elapsed_ms": 22291,
+  "file_hashes": {
+    "159201_nav.json": "f47eb255b83770bbacbeb87199309aa9921fc7db5865d354b022ee047d8e589e",
+    "159201_qfq.csv": "edcb601da656efd59692edd21c51d0e517643e820e7401113b1a91d575294b2e",
+    "159201_secondary.csv": "bf97eddddba7f52583246085e02fe82740849a2ab456e4e6c87140b4feea7eaf",
+    "159201_unadjusted.csv": "edcb601da656efd59692edd21c51d0e517643e820e7401113b1a91d575294b2e",
+    "159232_nav.json": "f47eb255b83770bbacbeb87199309aa9921fc7db5865d354b022ee047d8e589e",
+    "159232_qfq.csv": "c151dbbee2e97b6230a7c6a207b53f60864127f65cbae5b077d3a678b74969b2",
+    "159232_secondary.csv": "7a8859accc2a71846c6749670667331564d2afa53e41a51aafb2ddbae9c0ddcb",
+    "159232_unadjusted.csv": "2fc1bdba330fd59491e0dc6dbe8ab8b39a3f0639b16620631d2c543995968da5",
+    "513030_nav.json": "f47eb255b83770bbacbeb87199309aa9921fc7db5865d354b022ee047d8e589e",
+    "513030_qfq.csv": "816751b9469d18f4e2142b005f69d08c2c2b0de6c29b2f46a81847a28e6aaa87",
+    "513030_secondary.csv": "9bea11edf98d0ef5dfeb084f2b43104600b5522a4803e7b43eb291662fa47957",
+    "513030_unadjusted.csv": "816751b9469d18f4e2142b005f69d08c2c2b0de6c29b2f46a81847a28e6aaa87"
+  },
+  "generated_at": "2026-11-07T08:32:59.627042+00:00",
+  "layer": "INDEPENDENT_CANDIDATES",
+  "orders_generated": false,
+  "required_cutoff": "2026-11-06"
+}

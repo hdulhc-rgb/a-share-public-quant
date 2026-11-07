@@ -1,11 +1,11 @@
 {
   "adapter_version": "public-collector-1.1",
-  "as_of": "2026-09-05",
-  "data_cutoff": "2026-09-04",
-  "manifest_sha256": "1562f28ac1ed4d7c14355414260707eecf039e2a9b3f400b09deed0a736d1ca3",
+  "as_of": "2026-11-07",
+  "data_cutoff": "2026-11-06",
+  "manifest_sha256": "a4dc01564a49ebff2f1dd85c66cb4cbf90c7793bbdae2fd9d9d7ca1cb98bfa2b",
   "model_commit": "6ad8c97af188604cd83f0c5daada15eeda9e6aa7",
-  "packet": "runs/public_33947987626_3/full",
-  "run_id": "public_33947987626_3",
+  "packet": "runs/public_42355826934_1/full",
+  "run_id": "public_42355826934_1",
   "schema": "PUBLIC_SNAPSHOT_POINTER_V1",
   "status": "SUCCESS"
 }
